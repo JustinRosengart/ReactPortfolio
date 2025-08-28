@@ -23,8 +23,8 @@ const ProjectsPage: React.FC = () => {
 
     const getGridColumns = () => {
         if (projects.length === 1) return 'grid-cols-1 max-w-2xl mx-auto';
-        if (projects.length === 2) return 'grid-cols-1 lg:grid-cols-2 max-w-5xl mx-auto';
-        return 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-2';
+        if (projects.length === 2) return 'grid-cols-1 lg:grid-cols-2 max-w-6xl mx-auto';
+        return 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 max-w-7xl mx-auto';
     };
 
     const handleViewProject = (projectId: string) => {
@@ -102,35 +102,38 @@ const ProjectsPage: React.FC = () => {
             </div>
 
             {/* Projects Grid/List */}
-            {viewMode === 'grid' ? (
-                <div className={`grid gap-6 ${getGridColumns()}`}>
-                    {projectsToShow.map((project) => (
-                        <ProjectCard
-                            key={project.url}
-                            project={project}
-                            onViewDetails={handleViewProject}
-                        />
-                    ))}
-                </div>
-            ) : (
-                <div className="space-y-6 max-w-4xl mx-auto">
-                    {projectsToShow.map((project) => (
-                        <div key={project.url} className="transform scale-100">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {viewMode === 'grid' ? (
+                    <div className={`grid gap-8 ${getGridColumns()}`}>
+                        {projectsToShow.map((project) => (
                             <ProjectCard
+                                key={project.url}
                                 project={project}
                                 onViewDetails={handleViewProject}
+                                viewMode="grid"
                             />
-                        </div>
-                    ))}
-                </div>
-            )}
+                        ))}
+                    </div>
+                ) : (
+                    <div className="space-y-8 max-w-4xl mx-auto">
+                        {projectsToShow.map((project) => (
+                            <ProjectCard
+                                key={project.url}
+                                project={project}
+                                onViewDetails={handleViewProject}
+                                viewMode="list"
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
 
             {/* Show More/Less Button */}
             {hasMoreProjects && (
-                <div className="text-center mt-12">
+                <div className="text-center mt-16">
                     <button
                         onClick={() => setShowAll(!showAll)}
-                        className={`${themeClasses.button.primary}`}
+                        className={`${themeClasses.button.primary} px-8 py-3 text-lg font-medium`}
                     >
                         {showAll ? pageContent.projects.buttons.showLess : pageContent.projects.buttons.showMore.replace('{count}', projects.length.toString())}
                     </button>
