@@ -86,7 +86,18 @@ export const experiences: Experience[] = [
 
 // Certifications - List your certifications
 export const certifications: Certification[] = [
-    // Example: { id: 'cert-1', name: 'Certification Name', issuer: 'Issuer', date: 'Date' }
+    {
+        id: 'cert-aws-001',
+        name: 'AWS Certified Solutions Architect – Associate',
+        issuer: 'Amazon Web Services',
+        issueDate: '2024-05-15',
+        expirationDate: '2027-05-15',
+        credentialId: 'ABC123XYZ',
+        credentialUrl: 'https://www.your-verification-link.com',
+        description: 'Nachweis über Kenntnisse in der Entwicklung und Bereitstellung von Cloud-Lösungen auf AWS.',
+        experiences: 'Projektarbeit mit AWS, Cloud-Migration, Infrastruktur-Design',
+        icon: undefined
+    }
 ];
 
 // Legal Content - Privacy Policy (example)

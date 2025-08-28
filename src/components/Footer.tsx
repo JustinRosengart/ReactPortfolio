@@ -57,7 +57,7 @@ const Footer: React.FC = () => {
                             </span>
                         </div>
                         <p className="text-gray-600 dark:text-gray-300 mb-4 max-w-md">
-                            {personalInfo.tagline} {personalInfo.description}
+                            {personalInfo.tagline}
                         </p>
                         <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                             <div className="flex items-center space-x-1">
