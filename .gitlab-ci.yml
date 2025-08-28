@@ -1,4 +1,5 @@
 stages:
+  - optimize
   - build
   - deploy
 
@@ -21,6 +22,41 @@ build:
     paths:
       - ${BUILD_DIR}/
     expire_in: 1 hour
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+compress_images:
+  stage: optimize
+  image:
+    # Dieses Docker-Image enthält nützliche Werkzeuge wie jpegoptim, optipng und svgo
+    name: registry.gitlab.com/gitlab-org/build/cng/cf-imagemagick:latest
+    entrypoint: [""]
+  script:
+    - echo "Suche und komprimiere Bilder im Build-Verzeichnis..."
+    # Finde alle Bilder im Build-Ordner und komprimiere sie verlustfrei
+    - |
+      find ${BUILD_DIR} -type f -regex ".*\.\(jpg\|jpeg\|png\|svg\)" -print0 | while IFS= read -r -d '' file; do
+        echo "Komprimiere: $file"
+        case "$file" in
+          *.jpg|*.jpeg)
+            jpegoptim --strip-all --all-progressive "$file"
+            ;;
+          *.png)
+            optipng -o7 -strip all "$file"
+            ;;
+          *.svg)
+            svgo "$file"
+            ;;
+        esac
+      done
+    - echo "Kompression abgeschlossen."
+  artifacts:
+    # Gib den Build-Ordner mit den komprimierten Bildern an den nächsten Job weiter
+    paths:
+      - ${BUILD_DIR}/
+    expire_in: 1 hour
+  dependencies:
+    - build
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
@@ -81,7 +117,8 @@ deploy_production:
         ls -la $DEPLOY_PATH | head -5
       "
   dependencies:
-    - build
+    # Hängt jetzt vom compress_images-Job ab, um die optimierten Artefakte zu erhalten
+    - compress_images
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: manual
