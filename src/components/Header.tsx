@@ -71,13 +71,13 @@ const Header: React.FC = () => {
     const currentPage = getCurrentPage();
 
     return (
-        <header className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50 transition-colors duration-200">
+        <header className={`${themeClasses.card.base} shadow-sm sticky top-0 z-50 transition-colors duration-200`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     <a href={"/"} className="flex items-center space-x-3">
                         <div className="flex items-center space-x-3">
                             <span
-                                className="font-semibold text-lg text-gray-900 dark:text-white transition-colors duration-200">{personalInfo.name}</span>
+                                className={`font-semibold text-lg ${themeClasses.text.primaryDark} transition-colors duration-200`}>{personalInfo.name}</span>
                         </div>
                     </a>
 
@@ -90,7 +90,7 @@ const Header: React.FC = () => {
                                 className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
                                     currentPage === item.id
                                         ? `${themeClasses.text.primary} ${themeClasses.bg.primaryLighter}`
-                                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                                        : `${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover} ${themeClasses.bg.primaryLighter}`
                                 }`}
                             >
                                 <item.icon size={16}/>
@@ -103,7 +103,7 @@ const Header: React.FC = () => {
                     <div className="hidden md:block">
                         <button
                             onClick={toggleTheme}
-                            className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                            className={`p-2 rounded-lg ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover} ${themeClasses.bg.primaryLighter} transition-colors duration-200`}
                             aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
                         >
                             {isDarkMode ? <Sun size={20}/> : <Moon size={20}/>}
@@ -112,7 +112,7 @@ const Header: React.FC = () => {
 
                     {/* Mobile menu button */}
                     <button
-                        className="md:hidden p-2 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                        className={`md:hidden p-2 rounded-md ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover} ${themeClasses.bg.primaryLighter} transition-colors duration-200`}
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                     >
                         {isMenuOpen ? <X size={20}/> : <Menu size={20}/>}
@@ -122,7 +122,7 @@ const Header: React.FC = () => {
                 {/* Mobile Navigation */}
                 {isMenuOpen && (
                     <div
-                        className="md:hidden border-t border-gray-200 dark:border-gray-700 py-4 transition-colors duration-200">
+                        className={`md:hidden border-t ${themeClasses.border.primaryLight} py-4 transition-colors duration-200`}>
                         <nav className="flex flex-col space-y-2">
                             {navItems.map((item) => (
                                 <button
@@ -131,7 +131,7 @@ const Header: React.FC = () => {
                                     className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
                                         currentPage === item.id
                                             ? `${themeClasses.text.primary} ${themeClasses.bg.primaryLighter}`
-                                            : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                                            : `${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover} ${themeClasses.bg.primaryLighter}`
                                     }`}
                                 >
                                     <item.icon size={16}/>
@@ -142,7 +142,7 @@ const Header: React.FC = () => {
                             {/* Mobile Dark Mode Toggle */}
                             <button
                                 onClick={toggleTheme}
-                                className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover} ${themeClasses.bg.primaryLighter} transition-colors duration-200`}
                             >
                                 {isDarkMode ? <Sun size={16}/> : <Moon size={16}/>}
                                 <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>

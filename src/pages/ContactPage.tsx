@@ -24,11 +24,11 @@ const ContactPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+        <div className={`min-h-screen ${themeClasses.bg.primaryLighter} transition-colors duration-200`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div className="text-center mb-12">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{pageContent.contact.title}</h1>
-                    <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                    <h1 className={`text-3xl font-bold ${themeClasses.text.primaryDark} mb-4`}>{pageContent.contact.title}</h1>
+                    <p className={`${themeClasses.text.primaryLight} max-w-2xl mx-auto`}>
                         {pageContent.contact.description}
                     </p>
                 </div>
@@ -36,7 +36,7 @@ const ContactPage: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     {/* Contact Information */}
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">{pageContent.contact.sectionTitle}</h2>
+                        <h2 className={`text-2xl font-bold ${themeClasses.text.primaryDark} mb-8`}>{pageContent.contact.sectionTitle}</h2>
 
                         <div className="space-y-6">
                             <div className="flex items-center space-x-4">
@@ -45,8 +45,8 @@ const ContactPage: React.FC = () => {
                                     <Mail className={`w-6 h-6 ${themeClasses.text.primaryLight}`}/>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">{pageContent.contact.contactLabels.email}</p>
-                                    <p className="font-medium text-gray-900 dark:text-white">{personalInfo.email}</p>
+                                    <p className={`text-sm ${themeClasses.text.primary}`}>{pageContent.contact.contactLabels.email}</p>
+                                    <p className={`font-medium ${themeClasses.text.primaryDark}`}>{personalInfo.email}</p>
                                 </div>
                             </div>
 
@@ -56,10 +56,10 @@ const ContactPage: React.FC = () => {
                                     <Linkedin className={`w-6 h-6 ${themeClasses.text.primaryLight}`}/>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">{pageContent.contact.contactLabels.linkedin}</p>
+                                    <p className={`text-sm ${themeClasses.text.primary}`}>{pageContent.contact.contactLabels.linkedin}</p>
                                     <a
                                         href={contactInfo.socialLinks.find(link => link.name === 'LinkedIn')?.href || '#'}
-                                        className="font-medium text-gray-900 dark:text-white"
+                                        className={`font-medium ${themeClasses.text.primaryDark}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >
@@ -74,7 +74,7 @@ const ContactPage: React.FC = () => {
                     <div>
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <label className={`block text-sm font-medium ${themeClasses.text.primaryLight} mb-2`}>
                                     {pageContent.contact.formLabels.name}
                                 </label>
                                 <input
@@ -83,12 +83,12 @@ const ContactPage: React.FC = () => {
                                     value={formData.name}
                                     onChange={handleInputChange}
                                     placeholder={pageContent.contact.formPlaceholders.name}
-                                    className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 ${themeClasses.focus.primary} focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-200`}
+                                    className={`w-full px-4 py-3 border ${themeClasses.border.primaryLight} rounded-lg focus:ring-2 ${themeClasses.focus.primary} focus:border-transparent ${themeClasses.bg.primaryLighter} ${themeClasses.text.primaryDark} placeholder:${themeClasses.text.primaryLight} transition-colors duration-200`}
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <label className={`block text-sm font-medium ${themeClasses.text.primaryLight} mb-2`}>
                                     {pageContent.contact.formLabels.email}
                                 </label>
                                 <input
@@ -97,12 +97,12 @@ const ContactPage: React.FC = () => {
                                     value={formData.email}
                                     onChange={handleInputChange}
                                     placeholder={pageContent.contact.formPlaceholders.email}
-                                    className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 ${themeClasses.focus.primary} focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-200`}
+                                    className={`w-full px-4 py-3 border ${themeClasses.border.primaryLight} rounded-lg focus:ring-2 ${themeClasses.focus.primary} focus:border-transparent ${themeClasses.bg.primaryLighter} ${themeClasses.text.primaryDark} placeholder:${themeClasses.text.primaryLight} transition-colors duration-200`}
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <label className={`block text-sm font-medium ${themeClasses.text.primaryLight} mb-2`}>
                                     {pageContent.contact.formLabels.message}
                                 </label>
                                 <textarea
@@ -111,7 +111,7 @@ const ContactPage: React.FC = () => {
                                     onChange={handleInputChange}
                                     rows={6}
                                     placeholder={pageContent.contact.formPlaceholders.message}
-                                    className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 ${themeClasses.focus.primary} focus:border-transparent resize-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-200`}
+                                    className={`w-full px-4 py-3 border ${themeClasses.border.primaryLight} rounded-lg focus:ring-2 ${themeClasses.focus.primary} focus:border-transparent resize-none ${themeClasses.bg.primaryLighter} ${themeClasses.text.primaryDark} placeholder:${themeClasses.text.primaryLight} transition-colors duration-200`}
                                 ></textarea>
                             </div>
 

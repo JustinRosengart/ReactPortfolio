@@ -150,16 +150,6 @@ export const footerContent = {
     }
 };
 
-// SEO and Meta Information - Website metadata
-export const siteConfig = {
-    siteName: "Portfolio",
-    siteDescription: "Software Development Portfolio",
-    siteUrl: "https://ddineva.de",
-    author: "Denitsa Dineva",
-    locale: "en",
-    themeColor: "#8b5cf6", // purple-500
-};
-
 // Form Configuration - Contact form structure
 export const formConfig = {
     contact: {

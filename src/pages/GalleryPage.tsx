@@ -76,14 +76,14 @@ const GalleryPage: React.FC = () => {
     }, [selectedImage, closeImageModal, navigateImage]);
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+        <div className={`min-h-screen ${themeClasses.bg.primaryLighter} transition-colors duration-200`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 {/* Header */}
                 <div className="text-center mb-12">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                    <h1 className={`text-3xl font-bold ${themeClasses.text.primaryDark} mb-4`}>
                         {pageContent.gallery.title}
                     </h1>
-                    <p className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
+                    <p className={`${themeClasses.text.primaryLight} max-w-3xl mx-auto mb-8`}>
                         {pageContent.gallery.description}
                     </p>
                 </div>
@@ -128,7 +128,7 @@ const GalleryPage: React.FC = () => {
                             className={`p-2 rounded-lg transition-colors ${
                                 viewMode === 'grid'
                                     ? `${themeClasses.bg.primary} text-white`
-                                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                                    : `${themeClasses.bg.primaryLight} ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover}`
                             }`}
                             title={pageContent.gallery.viewModes.grid}
                         >
@@ -139,7 +139,7 @@ const GalleryPage: React.FC = () => {
                             className={`p-2 rounded-lg transition-colors ${
                                 viewMode === 'masonry'
                                     ? `${themeClasses.bg.primary} text-white`
-                                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                                    : `${themeClasses.bg.primaryLight} ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover}`
                             }`}
                             title={pageContent.gallery.viewModes.masonry}
                         >
@@ -158,7 +158,7 @@ const GalleryPage: React.FC = () => {
                         {filteredImages.map((image) => (
                             <div
                                 key={image.id}
-                                className="group relative bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-lg dark:hover:shadow-xl transition-all duration-300 cursor-pointer"
+                                className={`${themeClasses.card.base} overflow-hidden ${themeClasses.card.hover} cursor-pointer`}
                                 onClick={() => openImageModal(image)}
                             >
                                 {/* Image/Video Thumbnail */}

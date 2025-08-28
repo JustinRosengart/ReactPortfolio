@@ -4,11 +4,12 @@ import {Skill} from '../types';
 import {projects} from '../data/projects';
 import {personalInfo, skillsData} from '../data/personal';
 import {pageContent} from '../data/website';
+import { themeClasses } from '../config/theme';
 
 const AboutPage: React.FC = () => {
     // Helper function to render icons dynamically based on string
     const getIcon = (iconName: string): React.ReactNode => {
-        const iconProps = "w-6 h-6 text-purple-500 dark:text-purple-400";
+        const iconProps = `w-6 h-6 ${themeClasses.text.primary}`;
         switch (iconName) {
             case 'Code':
                 return <Code className={iconProps}/>;
@@ -31,26 +32,26 @@ const AboutPage: React.FC = () => {
     }));
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+        <div className={`min-h-screen ${themeClasses.bg.primaryLighter} transition-colors duration-200`}>
             {/* Hero Section */}
-            <section className="bg-white dark:bg-gray-800 py-16 transition-colors duration-200">
+            <section className={`${themeClasses.card.base} py-16 transition-colors duration-200`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div className="flex justify-center">
-                            <div className="w-80 h-80 bg-gradient-to-br rounded-2xl flex items-center justify-center">
+                            <div className={`w-80 h-80 bg-gradient-to-br rounded-2xl flex items-center justify-center`}>
                                 <img src={personalInfo.image}
                                      alt={personalInfo.name}
                                      className="w-58 h-58 object-cover border-4 shadow-md rounded-2xl"/>
                             </div>
                         </div>
                         <div>
-                            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+                            <h1 className={`text-4xl lg:text-5xl font-bold ${themeClasses.text.primaryDark} mb-6`}>
                                 {personalInfo.name}
                             </h1>
-                            <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
+                            <p className={`text-lg ${themeClasses.text.primaryLight} mb-6`}>
                                 {personalInfo.titleShort}
                             </p>
-                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                            <p className={`${themeClasses.text.primaryLight} leading-relaxed`}>
                                 {personalInfo.about}
                             </p>
                         </div>
@@ -62,8 +63,8 @@ const AboutPage: React.FC = () => {
             <section className="py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">My Skills</h2>
-                        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                        <h2 className={`text-3xl font-bold ${themeClasses.text.primaryDark} mb-4`}>My Skills</h2>
+                        <p className={`${themeClasses.text.primaryLight} max-w-2xl mx-auto`}>
                             Here is a selection of my technical skills and agile working methods that I have acquired
                             during my apprenticeship.
                         </p>
@@ -72,13 +73,13 @@ const AboutPage: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {skills.map((skill, index) => (
                             <div key={index}
-                                 className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md dark:hover:shadow-lg transition-all duration-200">
+                                 className={`${themeClasses.card.base} p-6 shadow-sm ${themeClasses.card.hover} transition-all duration-200`}>
                                 <div className="flex items-start space-x-4">
                                     <div className="flex-shrink-0">
                                         {skill.icon}
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{skill.name}</h3>
+                                        <h3 className={`font-semibold ${themeClasses.text.primaryDark} mb-2`}>{skill.name}</h3>
                                         <p className="text-gray-600 dark:text-gray-300 text-sm">{skill.description}</p>
                                     </div>
                                 </div>

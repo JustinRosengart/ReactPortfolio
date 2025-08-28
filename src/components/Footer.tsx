@@ -4,6 +4,7 @@ import {Github, Gitlab, Linkedin, Mail, MapPin} from 'lucide-react';
 import {contactInfo, galleryImages, personalInfo} from '../data/personal';
 import {projects} from '../data/projects';
 import {quickLinks} from '../data/website';
+import { themeClasses } from '../config/theme';
 
 const Footer: React.FC = () => {
     const navigate = useNavigate();
@@ -14,13 +15,13 @@ const Footer: React.FC = () => {
             name: 'Email',
             href: `mailto:${personalInfo.email}`,
             icon: Mail,
-            color: 'hover:text-purple-500 dark:hover:text-purple-400'
+            color: themeClasses.text.primaryHover
         },
         ...contactInfo.socialLinks.map(link => ({
             name: link.name,
             href: link.href,
             icon: link.name === 'LinkedIn' ? Linkedin : link.name === 'GitHub' ? Github : Gitlab,
-            color: link.color
+            color: themeClasses.text.primaryHover
         }))
     ];
 
@@ -45,7 +46,7 @@ const Footer: React.FC = () => {
 
     return (
         <footer
-            className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 transition-colors duration-200">
+            className={`${themeClasses.card.base} border-t ${themeClasses.border.primaryLight}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Main Footer Content */}
                 <div className="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -53,13 +54,13 @@ const Footer: React.FC = () => {
                     <div className="lg:col-span-2">
                         <div className="flex items-center space-x-3 mb-4">
                             <span
-                                className="font-semibold text-lg text-gray-900 dark:text-white">{personalInfo.name}
+                                className={`font-semibold text-lg ${themeClasses.text.primaryDark}`}>{personalInfo.name}
                             </span>
                         </div>
-                        <p className="text-gray-600 dark:text-gray-300 mb-4 max-w-md">
+                        <p className={`${themeClasses.text.primaryLight} mb-4 max-w-md`}>
                             {personalInfo.tagline}
                         </p>
-                        <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                        <div className={`flex items-center space-x-4 text-sm ${themeClasses.text.primaryLight}`}>
                             <div className="flex items-center space-x-1">
                                 <MapPin size={14}/>
                                 <span>{personalInfo.location.city + ", " + personalInfo.location.country}</span>
@@ -69,13 +70,13 @@ const Footer: React.FC = () => {
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Quick Links</h3>
+                        <h3 className={`font-semibold ${themeClasses.text.primaryDark} mb-4`}>Quick Links</h3>
                         <ul className="space-y-2">
                             {availableQuickLinks.map((link) => (
                                 <li key={link.name}>
                                     <button
                                         onClick={() => handleQuickLinkClick(link.path)}
-                                        className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors text-sm text-left"
+                                        className={`text-sm text-left ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover}`}
                                     >
                                         {link.name}
                                     </button>
@@ -86,7 +87,7 @@ const Footer: React.FC = () => {
 
                     {/* Connect */}
                     <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Connect</h3>
+                        <h3 className={`font-semibold ${themeClasses.text.primaryDark} mb-4`}>Connect</h3>
                         <div className="flex space-x-3">
                             {socialLinks.map((social) => (
                                 <a
@@ -94,7 +95,7 @@ const Footer: React.FC = () => {
                                     href={social.href}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className={`w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center text-gray-600 dark:text-gray-300 transition-colors ${social.color}`}
+                                    className={`w-10 h-10 ${themeClasses.bg.primaryLight} rounded-lg flex items-center justify-center ${themeClasses.text.primaryLight} transition-colors ${social.color}`}
                                     aria-label={social.name}
                                 >
                                     <social.icon size={18}/>
@@ -102,10 +103,10 @@ const Footer: React.FC = () => {
                             ))}
                         </div>
                         <div className="mt-4">
-                            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Get in touch</p>
+                            <p className={`text-sm ${themeClasses.text.primaryLight} mb-2`}>Get in touch</p>
                             <a
                                 href={`mailto:${personalInfo.email}`}
-                                className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                                className={`text-sm ${themeClasses.text.primary} ${themeClasses.text.primaryHover} transition-colors`}
                             >
                                 {personalInfo.email}
                             </a>
@@ -114,21 +115,21 @@ const Footer: React.FC = () => {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="border-t border-gray-200 dark:border-gray-700 py-6">
+                <div className={`border-t ${themeClasses.border.primaryLight} py-6`}>
                     <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                        <div className={`text-sm ${themeClasses.text.primaryLight}`}>
                             © {currentYear} {personalInfo.name}. All rights reserved.
                         </div>
-                        <div className="flex space-x-6 text-sm text-gray-500 dark:text-gray-400">
+                        <div className={`flex space-x-6 text-sm ${themeClasses.text.primaryLight}`}>
                             <button
                                 onClick={handlePrivacyClick}
-                                className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                                className={themeClasses.text.primaryHover}
                             >
                                 Privacy Policy
                             </button>
                             <button
                                 onClick={handleTermsClick}
-                                className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                                className={themeClasses.text.primaryHover}
                             >
                                 Terms of Service
                             </button>
