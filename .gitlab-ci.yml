@@ -1,6 +1,6 @@
 stages:
-  - optimize
   - build
+  - optimize
   - deploy
 
 variables:
