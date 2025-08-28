@@ -217,7 +217,7 @@ const createThemeClasses = (accentColor: keyof typeof THEME_DEFINITIONS) => {
         },
 
         // Card styles
-        navbar: 'bg-white dark:bg-gray-800 transition-colors duration-200',
+        sections: 'bg-white dark:bg-gray-800 transition-colors duration-200',
 
         // Input styles
         input: {

@@ -30,7 +30,7 @@ src/
 │   ├── Footer.tsx         # Site footer
 │   └── ProjectCard.tsx    # Project display card
 ├── pages/                 # Route-based page components
-│   ├── AboutPage.tsx      # Home/landing page
+│   ├── LandingPage.tsx      # Home/landing page
 │   ├── ProjectsPage.tsx   # Project portfolio listing
 │   ├── ProjectDetailPage.tsx # Individual project details
 │   ├── ContactPage.tsx    # Contact form
@@ -59,13 +59,13 @@ src/
 
 ### Routing Structure
 
-- `/` and `/home` → AboutPage (landing)
+- `/` and `/home` → LandingPage (landing)
 - `/projects` → ProjectsPage (portfolio listing)
 - `/projects/:id` → ProjectDetailPage (individual project)
 - `/contact` → ContactPage
 - `/profile` → ProfilePage
 - Legal pages: `/privacy-policy`, `/terms-of-service`
-- Fallback: `*` → AboutPage
+- Fallback: `*` → LandingPage
 
 ### Styling Strategy
 

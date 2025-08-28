@@ -6,7 +6,7 @@ import {personalInfo, skillsData} from '../data/personal';
 import {pageContent} from '../data/website';
 import { themeClasses } from '../config/theme';
 
-const AboutPage: React.FC = () => {
+const LandingPage: React.FC = () => {
     // Helper function to render icons dynamically based on string
     const getIcon = (iconName: string): React.ReactNode => {
         const iconProps = `w-6 h-6 ${themeClasses.text.accent}`;
@@ -34,7 +34,7 @@ const AboutPage: React.FC = () => {
     return (
         <div className={`min-h-screen ${themeClasses.bg.page} transition-colors duration-200`}>
             {/* Hero Section */}
-            <section className={`${themeClasses.card.base} py-16 transition-colors duration-200`}>
+            <section className={`${themeClasses.sections} py-16 transition-colors duration-200`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div className="flex justify-center">
@@ -133,4 +133,4 @@ const AboutPage: React.FC = () => {
     );
 };
 
-export default AboutPage;
+export default LandingPage;

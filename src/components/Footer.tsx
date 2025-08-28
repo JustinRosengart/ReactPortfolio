@@ -46,7 +46,7 @@ const Footer: React.FC = () => {
 
     return (
         <footer
-            className={`${themeClasses.card.base} border-t ${themeClasses.border.primaryLight}`}>
+            className={`${themeClasses.sections} border-t ${themeClasses.border.primaryLight}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Main Footer Content */}
                 <div className="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

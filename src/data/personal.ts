@@ -15,7 +15,7 @@ import {Briefcase, GraduationCap} from "lucide-react";
 // Personal Information - Fill with your own data
 export const personalInfo: PersonalInfo = {
     name: "Your Name",
-    image: "/assets/AboutPage/example-image.jpg", // Path to your profile image
+    image: "/assets/LandingPage/example-image.jpg", // Path to your profile image
     titleShort: "Your Short Title",
     titleLong: "Your Long Title or Description",
     email: "your.email@example.com",
