@@ -24,7 +24,7 @@ const ProjectsPage: React.FC = () => {
     const getGridColumns = () => {
         if (projects.length === 1) return 'grid-cols-1 max-w-2xl mx-auto';
         if (projects.length === 2) return 'grid-cols-1 lg:grid-cols-2 max-w-5xl mx-auto';
-        return 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-3';
+        return 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-2';
     };
 
     const handleViewProject = (projectId: string) => {
