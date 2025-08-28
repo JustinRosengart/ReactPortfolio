@@ -25,7 +25,7 @@ build:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
-deploy_production:
+deploy_production_new:
   stage: deploy
   image: alpine:latest
   before_script:
@@ -36,126 +36,54 @@ deploy_production:
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
   script:
+    - echo "=== NEUE PIPELINE VERSION ==="
+    - echo "Wenn du das siehst, läuft die neue Pipeline!"
+    - echo "SERVER_USER:" $SERVER_USER
+    - echo "SERVER_HOST:" $SERVER_HOST
+    - echo "DEPLOY_PATH:" $DEPLOY_PATH
+    - echo "BUILD_DIR:" $BUILD_DIR
     - |
-      # Debug: Variablen überprüfen
-      echo "=== DEBUG INFORMATIONEN ==="
-      echo "SERVER_USER: $SERVER_USER"
-      echo "SERVER_HOST: $SERVER_HOST" 
-      echo "DEPLOY_PATH: $DEPLOY_PATH"
-      echo "BUILD_DIR: $BUILD_DIR"
-      echo ""
-      echo "BUILD_DIR Inhalt:"
       if [ -d "${BUILD_DIR}" ]; then
+        echo "BUILD_DIR Inhalt:"
         ls -la ${BUILD_DIR}/
       else
         echo "FEHLER: BUILD_DIR existiert nicht!"
         exit 1
       fi
-      echo "=========================="
     - |
-      # Test SSH-Verbindung
-      echo "=== SSH VERBINDUNG TESTEN ==="
+      echo "=== SSH TEST ==="
       ssh $SERVER_USER@$SERVER_HOST "
         echo 'SSH erfolgreich als:' \$(whoami)
-        echo 'Aktuelles Verzeichnis:' \$(pwd)
-        echo 'Sudo-Rechte:'
-        sudo -l | head -10
-        echo 'System Info:'
-        uname -a
+        echo 'Sudo-Rechte verfügbar:'
+        sudo -l | grep -v 'may not run sudo' | head -5 || echo 'Keine sudo-Rechte gefunden'
       "
-      echo "============================="
     - |
-      # Pfad vorbereiten und testen
-      echo "=== DEPLOY PATH VORBEREITEN ==="
+      echo "=== PFAD SETUP ==="
       ssh $SERVER_USER@$SERVER_HOST "
-        set -e
-        echo 'Aktueller User:' \$(whoami)
         echo 'Deploy Path: $DEPLOY_PATH'
-      
-        # Überprüfen ob DEPLOY_PATH gesetzt ist
         if [ -z '$DEPLOY_PATH' ]; then
-          echo 'FEHLER: DEPLOY_PATH Variable ist leer!'
+          echo 'FEHLER: DEPLOY_PATH ist leer!'
           exit 1
         fi
-      
-        # Parent Directory erstellen falls nötig
-        sudo mkdir -p \$(dirname $DEPLOY_PATH)
-        echo 'Parent directory erstellt/existiert'
-      
-        # Deploy Path erstellen
         sudo mkdir -p $DEPLOY_PATH
-        echo 'Deploy Path erstellt/existiert'
-      
-        # Rechte setzen
         sudo chown -R $SERVER_USER:$SERVER_USER $DEPLOY_PATH
-        echo 'Ownership gesetzt auf $SERVER_USER:$SERVER_USER'
-      
-        # Verzeichnis-Info anzeigen
         ls -la \$(dirname $DEPLOY_PATH)
-        echo 'Deploy Path Details:'
-        ls -la $DEPLOY_PATH
       "
-      echo "==============================="
     - |
-      # Dateien synchronisieren
-      echo "=== RSYNC DEPLOYMENT ==="
-      if [ -d "${BUILD_DIR}" ] && [ "$(ls -A ${BUILD_DIR})" ]; then
-        echo "Starte Deployment von ${BUILD_DIR}/ nach $SERVER_USER@$SERVER_HOST:$DEPLOY_PATH/"
-      
-        rsync -avz --delete \
-          --exclude='.git*' \
-          --exclude='node_modules' \
-          --exclude='*.log' \
-          --dry-run \
-          ${BUILD_DIR}/ $SERVER_USER@$SERVER_HOST:$DEPLOY_PATH/
-      
-        echo "Dry-run erfolgreich. Starte echten Transfer..."
-      
-        rsync -avz --delete \
-          --exclude='.git*' \
-          --exclude='node_modules' \
-          --exclude='*.log' \
-          ${BUILD_DIR}/ $SERVER_USER@$SERVER_HOST:$DEPLOY_PATH/
-      
-        echo "Rsync abgeschlossen"
-      else
-        echo "FEHLER: BUILD_DIR ist leer oder existiert nicht!"
-        ls -la .
-        exit 1
-      fi
-      echo "========================"
+      echo "=== DEPLOYMENT ==="
+      rsync -avz --delete \
+        --exclude='.git*' \
+        --exclude='node_modules' \
+        ${BUILD_DIR}/ $SERVER_USER@$SERVER_HOST:$DEPLOY_PATH/
     - |
-      # Finale Konfiguration
-      echo "=== FINALE KONFIGURATION ==="
+      echo "=== FINALE SETUP ==="
       ssh $SERVER_USER@$SERVER_HOST "
-        set -e
-      
-        # Webserver-Rechte setzen
-        echo 'Setze Webserver-Rechte...'
         sudo chown -R www-data:www-data $DEPLOY_PATH
-      
-        # Directory-Rechte
-        echo 'Setze Directory-Rechte (755)...'
         sudo find $DEPLOY_PATH -type d -exec chmod 755 {} \;
-      
-        # File-Rechte
-        echo 'Setze File-Rechte (644)...'
         sudo find $DEPLOY_PATH -type f -exec chmod 644 {} \;
-      
-        # Apache neu laden
-        echo 'Lade Apache neu...'
         sudo systemctl reload apache2
-      
-        # Status überprüfen
-        echo 'Apache Status:'
-        sudo systemctl is-active apache2
-      
-        echo 'Finale Verzeichnis-Info:'
-        ls -la $DEPLOY_PATH
-      
-        echo 'Deployment erfolgreich abgeschlossen!'
+        echo 'Deployment abgeschlossen!'
       "
-      echo "============================"
   dependencies:
     - build
   rules:
