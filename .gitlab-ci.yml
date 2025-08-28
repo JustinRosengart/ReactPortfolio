@@ -64,4 +64,4 @@ deploy_production:
       when: manual
   environment:
     name: production
-    url: https://ddineva.de
+    url: $PRODUCTION_URL
