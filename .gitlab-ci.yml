@@ -25,7 +25,7 @@ build:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
-deploy_production_new:
+deploy_production_working:
   stage: deploy
   image: alpine:latest
   before_script:
@@ -36,54 +36,77 @@ deploy_production_new:
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
   script:
-    - echo "=== NEUE PIPELINE VERSION ==="
-    - echo "Wenn du das siehst, läuft die neue Pipeline!"
-    - echo "SERVER_USER:" $SERVER_USER
-    - echo "SERVER_HOST:" $SERVER_HOST
-    - echo "DEPLOY_PATH:" $DEPLOY_PATH
-    - echo "BUILD_DIR:" $BUILD_DIR
+    - echo "=== DEPLOYMENT START ==="
+    - echo "Deploy Path:" $DEPLOY_PATH
+    - echo "Server:" $SERVER_USER@$SERVER_HOST
     - |
-      if [ -d "${BUILD_DIR}" ]; then
-        echo "BUILD_DIR Inhalt:"
-        ls -la ${BUILD_DIR}/
-      else
-        echo "FEHLER: BUILD_DIR existiert nicht!"
+      # Build Directory validieren
+      if [ ! -d "${BUILD_DIR}" ] || [ ! "$(ls -A ${BUILD_DIR})" ]; then
+        echo "FEHLER: BUILD_DIR ist leer!"
         exit 1
       fi
+      echo "Build Directory OK - Dateien gefunden"
     - |
-      echo "=== SSH TEST ==="
+      # Verzeichnis auf Server vorbereiten
+      echo "=== VERZEICHNIS VORBEREITEN ==="
       ssh $SERVER_USER@$SERVER_HOST "
-        echo 'SSH erfolgreich als:' \$(whoami)
-        echo 'Sudo-Rechte verfügbar:'
-        sudo -l | grep -v 'may not run sudo' | head -5 || echo 'Keine sudo-Rechte gefunden'
-      "
-    - |
-      echo "=== PFAD SETUP ==="
-      ssh $SERVER_USER@$SERVER_HOST "
-        echo 'Deploy Path: $DEPLOY_PATH'
-        if [ -z '$DEPLOY_PATH' ]; then
-          echo 'FEHLER: DEPLOY_PATH ist leer!'
+        # Überprüfen ob sudo funktioniert
+        echo 'Testing sudo...'
+        if ! sudo -n true 2>/dev/null; then
+          echo 'FEHLER: Sudo funktioniert nicht. Bitte sudoers-Datei korrigieren!'
           exit 1
         fi
+      
+        # Verzeichnis erstellen
+        echo 'Erstelle Deploy-Verzeichnis...'
         sudo mkdir -p $DEPLOY_PATH
+      
+        # Temporäre Rechte für Deployment setzen
+        echo 'Setze temporäre Rechte für Deployment...'
         sudo chown -R $SERVER_USER:$SERVER_USER $DEPLOY_PATH
+      
+        echo 'Verzeichnis vorbereitet!'
         ls -la \$(dirname $DEPLOY_PATH)
       "
     - |
-      echo "=== DEPLOYMENT ==="
+      # Dateien mit rsync übertragen
+      echo "=== DATEIEN ÜBERTRAGEN ==="
       rsync -avz --delete \
         --exclude='.git*' \
         --exclude='node_modules' \
+        --exclude='*.log' \
         ${BUILD_DIR}/ $SERVER_USER@$SERVER_HOST:$DEPLOY_PATH/
+      
+      echo "Rsync abgeschlossen!"
     - |
-      echo "=== FINALE SETUP ==="
+      # Finale Rechte und Apache reload
+      echo "=== FINALE KONFIGURATION ==="
       ssh $SERVER_USER@$SERVER_HOST "
+        # Webserver-Rechte setzen
+        echo 'Setze Webserver-Rechte...'
         sudo chown -R www-data:www-data $DEPLOY_PATH
-        sudo find $DEPLOY_PATH -type d -exec chmod 755 {} \;
-        sudo find $DEPLOY_PATH -type f -exec chmod 644 {} \;
+      
+        # Verzeichnis-Rechte setzen
+        echo 'Setze Verzeichnis-Rechte...'
+        sudo chmod -R 755 $DEPLOY_PATH
+      
+        # Apache neu laden
+        echo 'Lade Apache neu...'
         sudo systemctl reload apache2
-        echo 'Deployment abgeschlossen!'
+      
+        # Status prüfen
+        if sudo systemctl is-active --quiet apache2; then
+          echo 'Apache läuft - Deployment erfolgreich!'
+        else
+          echo 'WARNUNG: Apache-Problem!'
+          sudo systemctl status apache2
+        fi
+      
+        # Finale Verzeichnis-Info
+        echo 'Deployed files:'
+        ls -la $DEPLOY_PATH | head -10
       "
+    - echo "=== DEPLOYMENT ABGESCHLOSSEN ==="
   dependencies:
     - build
   rules:
@@ -92,3 +115,46 @@ deploy_production_new:
   environment:
     name: production
     url: $PRODUCTION_URL
+
+# Rollback Job für Notfälle
+rollback_production:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
+  script:
+    - |
+      ssh $SERVER_USER@$SERVER_HOST "
+        # Backup-Verzeichnis finden
+        BACKUP_DIR=\$(ls -td ${DEPLOY_PATH}_backup_* 2>/dev/null | head -1)
+      
+        if [ -z \"\$BACKUP_DIR\" ]; then
+          echo 'Kein Backup gefunden!'
+          exit 1
+        fi
+      
+        echo \"Rollback zu: \$BACKUP_DIR\"
+      
+        # Aktuellen Stand sichern
+        sudo mv $DEPLOY_PATH ${DEPLOY_PATH}_broken_\$(date +%Y%m%d_%H%M%S)
+      
+        # Backup wiederherstellen
+        sudo mv \"\$BACKUP_DIR\" $DEPLOY_PATH
+        sudo chown -R www-data:www-data $DEPLOY_PATH
+        sudo chmod -R 755 $DEPLOY_PATH
+      
+        # Apache neu laden
+        sudo systemctl reload apache2
+      
+        echo 'Rollback abgeschlossen!'
+      "
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+  environment:
+    name: production
