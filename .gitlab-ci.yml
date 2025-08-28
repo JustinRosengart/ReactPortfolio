@@ -27,10 +27,11 @@ build:
 
 compress_images:
   stage: optimize
-  image:
-    # Dieses Docker-Image enthält nützliche Werkzeuge wie jpegoptim, optipng und svgo
-    name: registry.gitlab.com/gitlab-org/build/cng/cf-imagemagick:latest
-    entrypoint: [""]
+  image: alpine:latest
+  before_script:
+    # Install image optimization tools
+    - apk add --no-cache jpegoptim optipng nodejs npm
+    - npm install -g svgo
   script:
     - echo "Suche und komprimiere Bilder im Build-Verzeichnis..."
     # Finde alle Bilder im Build-Ordner und komprimiere sie verlustfrei
