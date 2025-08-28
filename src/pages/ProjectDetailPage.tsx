@@ -14,35 +14,35 @@ const MarkdownRenderer: React.FC<{ content: string }> = ({content}) => {
                 components={{
                     // Headers
                     h1: ({children}) => (
-                        <h1 className={`text-2xl font-bold ${themeClasses.text.primaryDark} mb-6 mt-8`}>
+                        <h1 className={`text-2xl font-bold ${themeClasses.text.primary} mb-6 mt-8`}>
                             {children}
                         </h1>
                     ),
                     h2: ({children}) => (
-                        <h2 className={`text-xl font-bold ${themeClasses.text.primaryDark} mb-4 mt-8`}>
+                        <h2 className={`text-xl font-bold ${themeClasses.text.primary} mb-4 mt-8`}>
                             {children}
                         </h2>
                     ),
                     h3: ({children}) => (
-                        <h3 className={`text-lg font-semibold ${themeClasses.text.primaryDark} mb-3 mt-6`}>
+                        <h3 className={`text-lg font-semibold ${themeClasses.text.primary} mb-3 mt-6`}>
                             {children}
                         </h3>
                     ),
                     // Paragraphs
                     p: ({children}) => (
-                        <p className={`${themeClasses.text.primaryLight} leading-relaxed mb-4`}>
+                        <p className={`${themeClasses.text.secondary} leading-relaxed mb-4`}>
                             {children}
                         </p>
                     ),
                     // Strong/Bold
                     strong: ({children}) => (
-                        <strong className={`font-semibold ${themeClasses.text.primaryDark}`}>
+                        <strong className={`font-semibold ${themeClasses.text.primary}`}>
                             {children}
                         </strong>
                     ),
                     // Emphasis/Italic
                     em: ({children}) => (
-                        <em className={`italic ${themeClasses.text.primaryLight}`}>
+                        <em className={`italic ${themeClasses.text.secondary}`}>
                             {children}
                         </em>
                     ),
@@ -57,7 +57,7 @@ const MarkdownRenderer: React.FC<{ content: string }> = ({content}) => {
                         if (isInline) {
                             return (
                                 <code
-                                    className={`${themeClasses.bg.primaryLighter} px-2 py-1 rounded text-sm ${themeClasses.text.primaryDark}`}
+                                    className={`${themeClasses.bg.primaryLighter} px-2 py-1 rounded text-sm ${themeClasses.text.primary}`}
                                     {...props}
                                 >
                                     {children}
@@ -66,7 +66,7 @@ const MarkdownRenderer: React.FC<{ content: string }> = ({content}) => {
                         }
                         return (
                             <code
-                                className={`text-sm ${themeClasses.text.primaryDark}`}
+                                className={`text-sm ${themeClasses.text.primary}`}
                                 {...props}
                             >
                                 {children}
@@ -85,7 +85,7 @@ const MarkdownRenderer: React.FC<{ content: string }> = ({content}) => {
                         </ol>
                     ),
                     li: ({children}) => (
-                        <li className={`${themeClasses.text.primaryLight} mb-1`}>
+                        <li className={`${themeClasses.text.secondary} mb-1`}>
                             {children}
                         </li>
                     ),
@@ -93,7 +93,7 @@ const MarkdownRenderer: React.FC<{ content: string }> = ({content}) => {
                     a: ({href, children}) => (
                         <a
                             href={href}
-                            className={`${themeClasses.text.primary} ${themeClasses.text.primaryHover} underline transition-colors`}
+                            className={`${themeClasses.text.accent} ${themeClasses.text.accentHover} underline transition-colors`}
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -107,7 +107,7 @@ const MarkdownRenderer: React.FC<{ content: string }> = ({content}) => {
                     // Blockquotes
                     blockquote: ({children}) => (
                         <blockquote
-                            className={`border-l-4 ${themeClasses.border.primary} pl-4 italic ${themeClasses.text.primaryLight} my-4`}>
+                            className={`border-l-4 ${themeClasses.border.primary} pl-4 italic ${themeClasses.text.secondary} my-4`}>
                             {children}
                         </blockquote>
                     ),
@@ -140,7 +140,7 @@ const ProjectDetailPage: React.FC = () => {
     };
 
     return (
-        <div className={`min-h-screen ${themeClasses.bg.primaryLighter} transition-colors duration-200`}>
+        <div className={`min-h-screen ${themeClasses.bg.page} transition-colors duration-200`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 {/* Back Button */}
                 <button
@@ -154,21 +154,21 @@ const ProjectDetailPage: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     {/* Project Content */}
                     <div>
-                        <h1 className={`text-4xl font-bold ${themeClasses.text.primaryDark} mb-6`}>{project.title}</h1>
+                        <h1 className={`text-4xl font-bold ${themeClasses.text.primary} mb-6`}>{project.title}</h1>
 
-                        <p className={`text-lg ${themeClasses.text.primaryLight} mb-8 leading-relaxed`}>
+                        <p className={`text-lg ${themeClasses.text.secondary} mb-8 leading-relaxed`}>
                             {project.description}
                         </p>
 
                         {/* Key Features */}
                         <div className="mb-8">
-                            <h2 className={`text-2xl font-bold ${themeClasses.text.primaryDark} mb-6`}>Key Features</h2>
+                            <h2 className={`text-2xl font-bold ${themeClasses.text.primary} mb-6`}>Key Features</h2>
                             <div className="space-y-4">
                                 {project.features.map((feature, index) => (
                                     <div key={index} className="flex items-center space-x-3">
                                         <CheckCircle
-                                            className={`w-6 h-6 ${themeClasses.text.primary} flex-shrink-0`}/>
-                                        <span className={`text-lg ${themeClasses.text.primaryLight}`}>{feature}</span>
+                                            className={`w-6 h-6 ${themeClasses.text.accent} flex-shrink-0`}/>
+                                        <span className={`text-lg ${themeClasses.text.secondary}`}>{feature}</span>
                                     </div>
                                 ))}
                             </div>
@@ -176,12 +176,12 @@ const ProjectDetailPage: React.FC = () => {
 
                         {/* Technologies Used */}
                         <div className="mb-8">
-                            <h2 className={`text-2xl font-bold ${themeClasses.text.primaryDark} mb-6`}>Technologies Used</h2>
+                            <h2 className={`text-2xl font-bold ${themeClasses.text.primary} mb-6`}>Technologies Used</h2>
                             <div className="flex flex-wrap gap-3">
                                 {project.technologies.map((tech, index) => (
                                     <span
                                         key={index}
-                                        className={`px-4 py-2 ${themeClasses.bg.primaryLight} ${themeClasses.text.primary} rounded-full text-base font-medium transition-colors duration-200`}
+                                        className={`px-4 py-2 ${themeClasses.bg.primaryLight} ${themeClasses.text.accent} rounded-full text-base font-medium transition-colors duration-200`}
                                     >
                                         {tech}
                                     </span>
@@ -221,7 +221,7 @@ const ProjectDetailPage: React.FC = () => {
                         <div
                             className={`${themeClasses.card.base} shadow-lg p-8 mb-8`}>
                             <div
-                                className={`${themeClasses.bg.primaryLighter} rounded-lg overflow-hidden h-96 transition-colors duration-200`}>
+                                className={`${themeClasses.bg.subtle} rounded-lg overflow-hidden h-96 transition-colors duration-200`}>
                                 {project.image && (
                                     <img
                                         src={project.image}
@@ -235,20 +235,20 @@ const ProjectDetailPage: React.FC = () => {
                         {/* Project Stats Card */}
                         <div
                             className={`${themeClasses.card.base} p-6`}>
-                            <h3 className={`text-xl font-bold ${themeClasses.text.primaryDark} mb-4`}>Project Overview</h3>
+                            <h3 className={`text-xl font-bold ${themeClasses.text.primary} mb-4`}>Project Overview</h3>
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <span className={`${themeClasses.text.primaryLight}`}>Features</span>
+                                    <span className={`${themeClasses.text.secondary}`}>Features</span>
                                     <span
-                                        className={`font-semibold ${themeClasses.text.primaryDark}`}>{project.features.length}</span>
+                                        className={`font-semibold ${themeClasses.text.primary}`}>{project.features.length}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className={`${themeClasses.text.primaryLight}`}>Technologies</span>
+                                    <span className={`${themeClasses.text.secondary}`}>Technologies</span>
                                     <span
-                                        className={`font-semibold ${themeClasses.text.primaryDark}`}>{project.technologies.length}</span>
+                                        className={`font-semibold ${themeClasses.text.primary}`}>{project.technologies.length}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className={`${themeClasses.text.primaryLight}`}>Status</span>
+                                    <span className={`${themeClasses.text.secondary}`}>Status</span>
                                     <span
                                         className={`px-3 py-1 rounded-full text-sm font-medium transition-colors duration-200 ${
                                             project.status === 'planned'
@@ -264,8 +264,8 @@ const ProjectDetailPage: React.FC = () => {
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className={`${themeClasses.text.primaryLight}`}>Type</span>
-                                    <span className={`font-semibold ${themeClasses.text.primaryDark}`}>{project.type}</span>
+                                    <span className={`${themeClasses.text.secondary}`}>Type</span>
+                                    <span className={`font-semibold ${themeClasses.text.primary}`}>{project.type}</span>
                                 </div>
                             </div>
                         </div>

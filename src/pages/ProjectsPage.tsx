@@ -32,12 +32,12 @@ const ProjectsPage: React.FC = () => {
     };
 
     return (
-        <div className={`min-h-screen ${themeClasses.bg.primaryLighter} transition-colors duration-200 mb-12`}>
+        <div className={`min-h-screen ${themeClasses.bg.page} transition-colors duration-200 mb-12`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 {/* Header */}
                 <div className="text-center mb-12">
-                    <h1 className={`text-3xl font-bold ${themeClasses.text.primaryDark} mb-4`}>{pageContent.projects.title}</h1>
-                    <p className={`${themeClasses.text.primaryLight} max-w-2xl mx-auto mb-6`}>
+                    <h1 className={`text-3xl font-bold ${themeClasses.text.accent} mb-4`}>{pageContent.projects.title}</h1>
+                    <p className={`${themeClasses.text.secondary} max-w-2xl mx-auto mb-6`}>
                         {pageContent.projects.description}
                         {((): string => {
                             if (projects.length === 0) return ` ${pageContent.projects.emptyState.message}`;
@@ -81,7 +81,7 @@ const ProjectsPage: React.FC = () => {
                         className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
                             viewMode === 'grid'
                                 ? `${themeClasses.bg.primary} text-white`
-                                : `${themeClasses.bg.primaryLight} ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover}`
+                                : `${themeClasses.bg.primaryLight} ${themeClasses.text.secondary} ${themeClasses.text.accentHover}`
                         }`}
                     >
                         <Grid size={16}/>
@@ -92,7 +92,7 @@ const ProjectsPage: React.FC = () => {
                         className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
                             viewMode === 'list'
                                 ? `${themeClasses.bg.primary} text-white`
-                                : `${themeClasses.bg.primaryLight} ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover}`
+                                : `${themeClasses.bg.primaryLight} ${themeClasses.text.secondary} ${themeClasses.text.accentHover}`
                         }`}
                     >
                         <List size={16}/>

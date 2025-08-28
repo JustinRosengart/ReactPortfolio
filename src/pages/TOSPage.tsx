@@ -12,22 +12,22 @@ const TermsOfServicePage: React.FC = () => {
     };
 
     return (
-        <div className={`min-h-screen ${themeClasses.bg.primaryLighter} transition-colors duration-200`}>
+        <div className={`min-h-screen ${themeClasses.bg.page} transition-colors duration-200`}>
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 {/* Back Button */}
                 <button
                     onClick={handleBack}
-                    className={`flex items-center space-x-2 ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover} mb-8`}
+                    className={`flex items-center space-x-2 ${themeClasses.text.secondary} ${themeClasses.text.accentHover} mb-8`}
                 >
                     <ArrowLeft size={20}/>
                     <span>Back</span>
                 </button>
 
                 <div className={`${themeClasses.card.base} p-8`}>
-                    <h1 className={`text-3xl font-bold ${themeClasses.text.primaryDark} mb-8`}>Terms of Service</h1>
+                    <h1 className={`text-3xl font-bold ${themeClasses.text.accent} mb-8`}>Terms of Service</h1>
 
                     <div className="prose max-w-none">
-                        <p className={`${themeClasses.text.primaryLight} mb-6`}>
+                        <p className={`${themeClasses.text.secondary} mb-6`}>
                             <strong>Last updated:</strong> {termsOfServiceContent.lastUpdated}
                         </p>
 
@@ -37,7 +37,7 @@ const TermsOfServicePage: React.FC = () => {
                                     return content.map((item, itemIndex) => {
                                         if (item.startsWith('•')) {
                                             return (
-                                                <li key={itemIndex} className={`${themeClasses.text.primaryLight}`}>
+                                                <li key={itemIndex} className={`${themeClasses.text.secondary}`}>
                                                     {item.substring(2)}
                                                 </li>
                                             );
@@ -45,13 +45,13 @@ const TermsOfServicePage: React.FC = () => {
                                             return <div key={itemIndex} className="mb-4"/>;
                                         } else {
                                             return (
-                                                <p key={itemIndex} className={`${themeClasses.text.primaryLight} mb-4`}>
+                                                <p key={itemIndex} className={`${themeClasses.text.secondary} mb-4`}>
                                                     {item.includes(personalInfo.email) ? (
                                                         <>
                                                             {item.split(personalInfo.email)[0]}
                                                             <a
                                                                 href={`mailto:${personalInfo.email}`}
-                                                                className={`${themeClasses.text.primary} ${themeClasses.text.primaryHover} underline`}
+                                                                className={`${themeClasses.text.accent} ${themeClasses.text.accentHover} underline`}
                                                             >
                                                                 {personalInfo.email}
                                                             </a>
@@ -66,13 +66,13 @@ const TermsOfServicePage: React.FC = () => {
                                     });
                                 } else {
                                     return (
-                                        <p className={`${themeClasses.text.primaryLight} mb-4`}>
+                                        <p className={`${themeClasses.text.secondary} mb-4`}>
                                             {content.includes(personalInfo.email) ? (
                                                 <>
                                                     {content.split(personalInfo.email)[0]}
                                                     <a
                                                         href={`mailto:${personalInfo.email}`}
-                                                        className={`${themeClasses.text.primary} ${themeClasses.text.primaryHover} underline`}
+                                                        className={`${themeClasses.text.accent} ${themeClasses.text.accentHover} underline`}
                                                     >
                                                         {personalInfo.email}
                                                     </a>

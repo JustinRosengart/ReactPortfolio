@@ -15,13 +15,13 @@ const Footer: React.FC = () => {
             name: 'Email',
             href: `mailto:${personalInfo.email}`,
             icon: Mail,
-            color: themeClasses.text.primaryHover
+            color: themeClasses.text.accentHover
         },
         ...contactInfo.socialLinks.map(link => ({
             name: link.name,
             href: link.href,
             icon: link.name === 'LinkedIn' ? Linkedin : link.name === 'GitHub' ? Github : Gitlab,
-            color: themeClasses.text.primaryHover
+            color: themeClasses.text.accentHover
         }))
     ];
 
@@ -54,13 +54,13 @@ const Footer: React.FC = () => {
                     <div className="lg:col-span-2">
                         <div className="flex items-center space-x-3 mb-4">
                             <span
-                                className={`font-semibold text-lg ${themeClasses.text.primaryDark}`}>{personalInfo.name}
+                                className={`font-semibold text-lg ${themeClasses.text.accent}`}>{personalInfo.name}
                             </span>
                         </div>
-                        <p className={`${themeClasses.text.primaryLight} mb-4 max-w-md`}>
+                        <p className={`${themeClasses.text.secondary} mb-4 max-w-md`}>
                             {personalInfo.tagline}
                         </p>
-                        <div className={`flex items-center space-x-4 text-sm ${themeClasses.text.primaryLight}`}>
+                        <div className={`flex items-center space-x-4 text-sm ${themeClasses.text.secondary}`}>
                             <div className="flex items-center space-x-1">
                                 <MapPin size={14}/>
                                 <span>{personalInfo.location.city + ", " + personalInfo.location.country}</span>
@@ -70,13 +70,13 @@ const Footer: React.FC = () => {
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className={`font-semibold ${themeClasses.text.primaryDark} mb-4`}>Quick Links</h3>
+                        <h3 className={`font-semibold ${themeClasses.text.accent} mb-4`}>Quick Links</h3>
                         <ul className="space-y-2">
                             {availableQuickLinks.map((link) => (
                                 <li key={link.name}>
                                     <button
                                         onClick={() => handleQuickLinkClick(link.path)}
-                                        className={`text-sm text-left ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover}`}
+                                        className={`text-sm text-left ${themeClasses.text.secondary} ${themeClasses.text.accentHover}`}
                                     >
                                         {link.name}
                                     </button>
@@ -87,7 +87,7 @@ const Footer: React.FC = () => {
 
                     {/* Connect */}
                     <div>
-                        <h3 className={`font-semibold ${themeClasses.text.primaryDark} mb-4`}>Connect</h3>
+                        <h3 className={`font-semibold ${themeClasses.text.accent} mb-4`}>Connect</h3>
                         <div className="flex space-x-3">
                             {socialLinks.map((social) => (
                                 <a
@@ -95,7 +95,7 @@ const Footer: React.FC = () => {
                                     href={social.href}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className={`w-10 h-10 ${themeClasses.bg.primaryLight} rounded-lg flex items-center justify-center ${themeClasses.text.primaryLight} transition-colors ${social.color}`}
+                                    className={`w-10 h-10 ${themeClasses.bg.primaryLight} rounded-lg flex items-center justify-center ${themeClasses.text.secondary} transition-colors ${social.color}`}
                                     aria-label={social.name}
                                 >
                                     <social.icon size={18}/>
@@ -103,10 +103,10 @@ const Footer: React.FC = () => {
                             ))}
                         </div>
                         <div className="mt-4">
-                            <p className={`text-sm ${themeClasses.text.primaryLight} mb-2`}>Get in touch</p>
+                            <p className={`text-sm ${themeClasses.text.secondary} mb-2`}>Get in touch</p>
                             <a
                                 href={`mailto:${personalInfo.email}`}
-                                className={`text-sm ${themeClasses.text.primary} ${themeClasses.text.primaryHover} transition-colors`}
+                                className={`text-sm ${themeClasses.text.accent} ${themeClasses.text.accentHover} transition-colors`}
                             >
                                 {personalInfo.email}
                             </a>
@@ -117,19 +117,19 @@ const Footer: React.FC = () => {
                 {/* Bottom Bar */}
                 <div className={`border-t ${themeClasses.border.primaryLight} py-6`}>
                     <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                        <div className={`text-sm ${themeClasses.text.primaryLight}`}>
+                        <div className={`text-sm ${themeClasses.text.secondary}`}>
                             © {currentYear} {personalInfo.name}. All rights reserved.
                         </div>
-                        <div className={`flex space-x-6 text-sm ${themeClasses.text.primaryLight}`}>
+                        <div className={`flex space-x-6 text-sm ${themeClasses.text.secondary}`}>
                             <button
                                 onClick={handlePrivacyClick}
-                                className={themeClasses.text.primaryHover}
+                                className={themeClasses.text.accentHover}
                             >
                                 Privacy Policy
                             </button>
                             <button
                                 onClick={handleTermsClick}
-                                className={themeClasses.text.primaryHover}
+                                className={themeClasses.text.accentHover}
                             >
                                 Terms of Service
                             </button>

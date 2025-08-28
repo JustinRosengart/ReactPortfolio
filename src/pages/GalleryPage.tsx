@@ -76,14 +76,14 @@ const GalleryPage: React.FC = () => {
     }, [selectedImage, closeImageModal, navigateImage]);
 
     return (
-        <div className={`min-h-screen ${themeClasses.bg.primaryLighter} transition-colors duration-200`}>
+        <div className={`min-h-screen ${themeClasses.bg.page} transition-colors duration-200`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 {/* Header */}
                 <div className="text-center mb-12">
-                    <h1 className={`text-3xl font-bold ${themeClasses.text.primaryDark} mb-4`}>
+                    <h1 className={`text-3xl font-bold ${themeClasses.text.accent} mb-4`}>
                         {pageContent.gallery.title}
                     </h1>
-                    <p className={`${themeClasses.text.primaryLight} max-w-3xl mx-auto mb-8`}>
+                    <p className={`${themeClasses.text.secondary} max-w-3xl mx-auto mb-8`}>
                         {pageContent.gallery.description}
                     </p>
                 </div>
@@ -128,7 +128,7 @@ const GalleryPage: React.FC = () => {
                             className={`p-2 rounded-lg transition-colors ${
                                 viewMode === 'grid'
                                     ? `${themeClasses.bg.primary} text-white`
-                                    : `${themeClasses.bg.primaryLight} ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover}`
+                                    : `${themeClasses.bg.primaryLight} ${themeClasses.text.secondary} ${themeClasses.text.accentHover}`
                             }`}
                             title={pageContent.gallery.viewModes.grid}
                         >
@@ -139,7 +139,7 @@ const GalleryPage: React.FC = () => {
                             className={`p-2 rounded-lg transition-colors ${
                                 viewMode === 'masonry'
                                     ? `${themeClasses.bg.primary} text-white`
-                                    : `${themeClasses.bg.primaryLight} ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover}`
+                                    : `${themeClasses.bg.primaryLight} ${themeClasses.text.secondary} ${themeClasses.text.accentHover}`
                             }`}
                             title={pageContent.gallery.viewModes.masonry}
                         >
@@ -207,7 +207,7 @@ const GalleryPage: React.FC = () => {
                                             {image.tags.slice(0, 3).map((tag) => (
                                                 <span
                                                     key={tag}
-                                                    className={`text-xs px-2 py-1 rounded-full ${themeClasses.bg.primaryLight} ${themeClasses.text.primaryDark}`}
+                                                    className={`text-xs px-2 py-1 rounded-full ${themeClasses.bg.primaryLight} ${themeClasses.text.accent}`}
                                                 >
                                                     {tag}
                                                 </span>

@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {Briefcase, CircleUserRound, House, Image, Mail, Menu, Moon, Sun, X} from 'lucide-react';
 import {NavItem} from '../types';
-import {useDarkMode} from "../contexts/DarkModeContext";
+import {useTheme} from "../contexts/ThemeContext";
 import {galleryImages, personalInfo} from '../data/personal';
 import {projects} from '../data/projects';
 import {themeClasses} from '../config/theme';
@@ -11,7 +11,7 @@ const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
-    const {isDarkMode, toggleTheme} = useDarkMode();
+    const {isDarkMode, toggleTheme} = useTheme();
 
     const allNavItems: NavItem[] = [
         {id: 'home', label: 'Home', icon: House},
@@ -77,7 +77,7 @@ const Header: React.FC = () => {
                     <a href={"/"} className="flex items-center space-x-3">
                         <div className="flex items-center space-x-3">
                             <span
-                                className={`font-semibold text-lg ${themeClasses.text.primaryDark} transition-colors duration-200`}>{personalInfo.name}</span>
+                                className={`font-semibold text-lg ${themeClasses.text.accent} transition-colors duration-200`}>{personalInfo.name}</span>
                         </div>
                     </a>
 
@@ -89,8 +89,8 @@ const Header: React.FC = () => {
                                 onClick={() => handleNavigate(item.id)}
                                 className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
                                     currentPage === item.id
-                                        ? `${themeClasses.text.primary} ${themeClasses.bg.primaryLighter}`
-                                        : `${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover} ${themeClasses.bg.primaryLighter}`
+                                        ? `${themeClasses.text.accent} ${themeClasses.bg.primaryLighter}`
+                                        : `${themeClasses.text.secondary} ${themeClasses.text.accentHover}`
                                 }`}
                             >
                                 <item.icon size={16}/>
@@ -103,7 +103,7 @@ const Header: React.FC = () => {
                     <div className="hidden md:block">
                         <button
                             onClick={toggleTheme}
-                            className={`p-2 rounded-lg ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover} ${themeClasses.bg.primaryLighter} transition-colors duration-200`}
+                            className={`p-2 rounded-lg ${themeClasses.text.tertiary} ${themeClasses.text.accentHover} transition-colors duration-200`}
                             aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
                         >
                             {isDarkMode ? <Sun size={20}/> : <Moon size={20}/>}
@@ -112,7 +112,7 @@ const Header: React.FC = () => {
 
                     {/* Mobile menu button */}
                     <button
-                        className={`md:hidden p-2 rounded-md ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover} ${themeClasses.bg.primaryLighter} transition-colors duration-200`}
+                        className={`md:hidden p-2 rounded-md ${themeClasses.text.tertiary} ${themeClasses.text.accentHover} transition-colors duration-200`}
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                     >
                         {isMenuOpen ? <X size={20}/> : <Menu size={20}/>}
@@ -130,8 +130,8 @@ const Header: React.FC = () => {
                                     onClick={() => handleNavigate(item.id)}
                                     className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
                                         currentPage === item.id
-                                            ? `${themeClasses.text.primary} ${themeClasses.bg.primaryLighter}`
-                                            : `${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover} ${themeClasses.bg.primaryLighter}`
+                                            ? `${themeClasses.text.accent} ${themeClasses.bg.primaryLighter}`
+                                            : `${themeClasses.text.secondary} ${themeClasses.text.accentHover}`
                                     }`}
                                 >
                                     <item.icon size={16}/>
@@ -142,7 +142,7 @@ const Header: React.FC = () => {
                             {/* Mobile Dark Mode Toggle */}
                             <button
                                 onClick={toggleTheme}
-                                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover} ${themeClasses.bg.primaryLighter} transition-colors duration-200`}
+                                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium ${themeClasses.text.secondary} ${themeClasses.text.accentHover} transition-colors duration-200`}
                             >
                                 {isDarkMode ? <Sun size={16}/> : <Moon size={16}/>}
                                 <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
