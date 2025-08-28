@@ -216,6 +216,9 @@ const createThemeClasses = (accentColor: keyof typeof THEME_DEFINITIONS) => {
             hover: 'hover:shadow-lg dark:hover:shadow-xl transition-shadow duration-200'
         },
 
+        // Card styles
+        navbar: 'bg-white dark:bg-gray-800 transition-colors duration-200',
+
         // Input styles
         input: {
             base: 'w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder:text-gray-500 dark:placeholder:text-gray-400 transition-colors duration-200',
