@@ -6,7 +6,6 @@ variables:
   NODE_VERSION: "20"
   BUILD_DIR: "build"
 
-# Cache node_modules for faster builds
 cache:
   paths:
     - node_modules/
@@ -25,7 +24,7 @@ build:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
-deploy_production_working:
+deploy_production:
   stage: deploy
   image: alpine:latest
   before_script:
@@ -36,77 +35,51 @@ deploy_production_working:
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
   script:
-    - echo "=== DEPLOYMENT START ==="
-    - echo "Deploy Path:" $DEPLOY_PATH
-    - echo "Server:" $SERVER_USER@$SERVER_HOST
     - |
-      # Build Directory validieren
-      if [ ! -d "${BUILD_DIR}" ] || [ ! "$(ls -A ${BUILD_DIR})" ]; then
-        echo "FEHLER: BUILD_DIR ist leer!"
-        exit 1
-      fi
-      echo "Build Directory OK - Dateien gefunden"
-    - |
-      # Verzeichnis auf Server vorbereiten
-      echo "=== VERZEICHNIS VORBEREITEN ==="
+      # Backup des aktuellen Deployments erstellen
       ssh $SERVER_USER@$SERVER_HOST "
-        # Überprüfen ob sudo funktioniert
-        echo 'Testing sudo...'
-        if ! sudo -n true 2>/dev/null; then
-          echo 'FEHLER: Sudo funktioniert nicht. Bitte sudoers-Datei korrigieren!'
-          exit 1
+        if [ -d '$DEPLOY_PATH' ]; then
+          sudo cp -r $DEPLOY_PATH ${DEPLOY_PATH}_backup_\$(date +%Y%m%d_%H%M%S)
+          echo 'Backup erstellt'
         fi
-      
-        # Verzeichnis erstellen
-        echo 'Erstelle Deploy-Verzeichnis...'
-        sudo mkdir -p $DEPLOY_PATH
-      
-        # Temporäre Rechte für Deployment setzen
-        echo 'Setze temporäre Rechte für Deployment...'
-        sudo chown -R $SERVER_USER:$SERVER_USER $DEPLOY_PATH
-      
-        echo 'Verzeichnis vorbereitet!'
-        ls -la \$(dirname $DEPLOY_PATH)
       "
     - |
-      # Dateien mit rsync übertragen
-      echo "=== DATEIEN ÜBERTRAGEN ==="
+      # Deployment-Verzeichnis vorbereiten
+      ssh $SERVER_USER@$SERVER_HOST "
+        sudo mkdir -p $DEPLOY_PATH
+        sudo chown -R $SERVER_USER:$SERVER_USER $DEPLOY_PATH
+        echo 'Deploy-Verzeichnis vorbereitet'
+      "
+    - |
+      # Dateien synchronisieren
       rsync -avz --delete \
         --exclude='.git*' \
         --exclude='node_modules' \
         --exclude='*.log' \
         ${BUILD_DIR}/ $SERVER_USER@$SERVER_HOST:$DEPLOY_PATH/
       
-      echo "Rsync abgeschlossen!"
+      echo "Dateien erfolgreich übertragen"
     - |
-      # Finale Rechte und Apache reload
-      echo "=== FINALE KONFIGURATION ==="
+      # Finale Konfiguration
       ssh $SERVER_USER@$SERVER_HOST "
         # Webserver-Rechte setzen
-        echo 'Setze Webserver-Rechte...'
         sudo chown -R www-data:www-data $DEPLOY_PATH
-      
-        # Verzeichnis-Rechte setzen
-        echo 'Setze Verzeichnis-Rechte...'
         sudo chmod -R 755 $DEPLOY_PATH
       
         # Apache neu laden
-        echo 'Lade Apache neu...'
         sudo systemctl reload apache2
       
-        # Status prüfen
+        # Status überprüfen
         if sudo systemctl is-active --quiet apache2; then
-          echo 'Apache läuft - Deployment erfolgreich!'
+          echo '✅ Deployment erfolgreich - Apache läuft'
         else
-          echo 'WARNUNG: Apache-Problem!'
-          sudo systemctl status apache2
+          echo '❌ Apache-Problem!'
+          exit 1
         fi
       
-        # Finale Verzeichnis-Info
         echo 'Deployed files:'
-        ls -la $DEPLOY_PATH | head -10
+        ls -la $DEPLOY_PATH | head -5
       "
-    - echo "=== DEPLOYMENT ABGESCHLOSSEN ==="
   dependencies:
     - build
   rules:
@@ -116,7 +89,6 @@ deploy_production_working:
     name: production
     url: $PRODUCTION_URL
 
-# Rollback Job für Notfälle
 rollback_production:
   stage: deploy
   image: alpine:latest
@@ -130,28 +102,24 @@ rollback_production:
   script:
     - |
       ssh $SERVER_USER@$SERVER_HOST "
-        # Backup-Verzeichnis finden
-        BACKUP_DIR=\$(ls -td ${DEPLOY_PATH}_backup_* 2>/dev/null | head -1)
+        # Neuestes Backup finden
+        BACKUP=\$(ls -td ${DEPLOY_PATH}_backup_* 2>/dev/null | head -1)
       
-        if [ -z \"\$BACKUP_DIR\" ]; then
+        if [ -z \"\$BACKUP\" ]; then
           echo 'Kein Backup gefunden!'
           exit 1
         fi
       
-        echo \"Rollback zu: \$BACKUP_DIR\"
+        echo \"Rollback zu: \$BACKUP\"
       
-        # Aktuellen Stand sichern
+        # Rollback durchführen
         sudo mv $DEPLOY_PATH ${DEPLOY_PATH}_broken_\$(date +%Y%m%d_%H%M%S)
-      
-        # Backup wiederherstellen
-        sudo mv \"\$BACKUP_DIR\" $DEPLOY_PATH
+        sudo mv \"\$BACKUP\" $DEPLOY_PATH
         sudo chown -R www-data:www-data $DEPLOY_PATH
         sudo chmod -R 755 $DEPLOY_PATH
-      
-        # Apache neu laden
         sudo systemctl reload apache2
       
-        echo 'Rollback abgeschlossen!'
+        echo '✅ Rollback erfolgreich abgeschlossen'
       "
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
