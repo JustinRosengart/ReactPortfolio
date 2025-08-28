@@ -89,46 +89,48 @@ const LandingPage: React.FC = () => {
                 </div>
             </section>
 
-            {/* Projects Statistics */}
-            <section className="py-16 bg-white dark:bg-gray-800 transition-colors duration-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">My Work</h2>
-                        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                            Overview of my project accomplishments and technical experience gained during my
-                            apprenticeship.
-                        </p>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div
-                            className="text-center p-6 bg-gray-50 dark:bg-gray-700 rounded-xl transition-colors duration-200">
+            {/* Projects Statistics - Only show if projects exist */}
+            {projects.length > 0 && (
+                <section className="py-16 bg-white dark:bg-gray-800 transition-colors duration-200">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">My Work</h2>
+                            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                                Overview of my project accomplishments and technical experience gained during my
+                                apprenticeship.
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             <div
-                                className="text-4xl font-bold text-purple-500 dark:text-purple-400 mb-2">{projects.length}</div>
+                                className="text-center p-6 bg-gray-50 dark:bg-gray-700 rounded-xl transition-colors duration-200">
+                                <div
+                                    className="text-4xl font-bold text-purple-500 dark:text-purple-400 mb-2">{projects.length}</div>
+                                <div
+                                    className="text-gray-600 dark:text-gray-300 font-medium">{pageContent.about.stats.projectsLabel}</div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Real-world applications</div>
+                            </div>
                             <div
-                                className="text-gray-600 dark:text-gray-300 font-medium">{pageContent.about.stats.projectsLabel}</div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Real-world applications</div>
-                        </div>
-                        <div
-                            className="text-center p-6 bg-gray-50 dark:bg-gray-700 rounded-xl transition-colors duration-200">
-                            <div className="text-4xl font-bold text-green-500 dark:text-green-400 mb-2">
-                                {projects.reduce((acc, project) => acc + project.technologies.length, 0)}
+                                className="text-center p-6 bg-gray-50 dark:bg-gray-700 rounded-xl transition-colors duration-200">
+                                <div className="text-4xl font-bold text-green-500 dark:text-green-400 mb-2">
+                                    {projects.reduce((acc, project) => acc + project.technologies.length, 0)}
+                                </div>
+                                <div className="text-gray-600 dark:text-gray-300 font-medium">Technologies Used</div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Programming languages &
+                                    tools
+                                </div>
                             </div>
-                            <div className="text-gray-600 dark:text-gray-300 font-medium">Technologies Used</div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Programming languages &
-                                tools
+                            <div
+                                className="text-center p-6 bg-gray-50 dark:bg-gray-700 rounded-xl transition-colors duration-200">
+                                <div className="text-4xl font-bold text-purple-500 dark:text-purple-400 mb-2">
+                                    {projects.reduce((acc, project) => acc + project.features.length, 0)}
+                                </div>
+                                <div className="text-gray-600 dark:text-gray-300 font-medium">Features Implemented</div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Functional components</div>
                             </div>
-                        </div>
-                        <div
-                            className="text-center p-6 bg-gray-50 dark:bg-gray-700 rounded-xl transition-colors duration-200">
-                            <div className="text-4xl font-bold text-purple-500 dark:text-purple-400 mb-2">
-                                {projects.reduce((acc, project) => acc + project.features.length, 0)}
-                            </div>
-                            <div className="text-gray-600 dark:text-gray-300 font-medium">Features Implemented</div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Functional components</div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
         </div>
     );
 };
