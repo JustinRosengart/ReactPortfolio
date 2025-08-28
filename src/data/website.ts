@@ -12,7 +12,7 @@ export const pageContent = {
     about: {
         title: "About Me",
         stats: {
-            projectsLabel: "Projects Completed",
+            projectsLabel: "Projects",
             experienceLabel: "Months of Experience",
             technologiesLabel: "Technologies Learned",
             certificationsLabel: "Certifications"
