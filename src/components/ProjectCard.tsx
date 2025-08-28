@@ -131,22 +131,22 @@ const ProjectCard: React.FC<ProjectCardProps> = ({project, onViewDetails, viewMo
                                 <ArrowRight size={14}/>
                             </button>
                             
-                            <div className={`${(project.demoUrl && project.repositoryUrl) ? 'flex space-x-1' : 'flex'}`}>
+                            <div className={`${(project.demoUrl && project.repositoryUrl) ? 'flex space-x-2' : 'flex'}`}>
                                 {project.demoUrl && (
                                     <button
-                                        className={`flex items-center space-x-1 ${themeClasses.button.secondary} px-2 py-1.5 text-xs hover:scale-[1.02] transition-all duration-200 ${!(project.demoUrl && project.repositoryUrl) ? 'w-full' : ''}`}
+                                        className={`flex items-center space-x-1 ${themeClasses.button.secondary} px-3 py-2 text-sm hover:scale-[1.02] transition-all duration-200 ${!(project.demoUrl && project.repositoryUrl) ? 'w-full' : 'flex-1'}`}
                                         onClick={() => window.open(project.demoUrl, '_blank')}
                                     >
-                                        <ExternalLink size={12}/>
+                                        <ExternalLink size={14}/>
                                         <span>Demo</span>
                                     </button>
                                 )}
                                 {project.repositoryUrl && (
                                     <button
-                                        className={`flex items-center space-x-1 ${themeClasses.button.secondary} px-2 py-1.5 text-xs hover:scale-[1.02] transition-all duration-200 ${!(project.demoUrl && project.repositoryUrl) ? 'w-full' : ''}`}
+                                        className={`flex items-center space-x-1 ${themeClasses.button.secondary} px-3 py-2 text-sm hover:scale-[1.02] transition-all duration-200 ${!(project.demoUrl && project.repositoryUrl) ? 'w-full' : 'flex-1'}`}
                                         onClick={() => window.open(project.repositoryUrl, '_blank')}
                                     >
-                                        <Github size={12}/>
+                                        <Github size={14}/>
                                         <span>Code</span>
                                     </button>
                                 )}
@@ -239,10 +239,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({project, onViewDetails, viewMo
                     </button>
 
                     {/* Demo and Code Buttons */}
-                    <div className={`${(project.demoUrl && project.repositoryUrl) ? 'grid grid-cols-2 gap-3' : 'flex'}`}>
+                    <div className={`${(project.demoUrl && project.repositoryUrl) ? 'grid grid-cols-2 gap-3' : 'w-full'}`}>
                         {project.demoUrl && (
                             <button
-                                className={`flex items-center justify-center space-x-2 ${themeClasses.button.secondary} text-sm py-2.5 hover:scale-[1.02] transition-all duration-200`}
+                                className={`flex items-center justify-center space-x-2 ${themeClasses.button.secondary} text-sm py-2.5 hover:scale-[1.02] transition-all duration-200 ${!(project.demoUrl && project.repositoryUrl) ? 'w-full' : ''}`}
                                 onClick={() => window.open(project.demoUrl, '_blank')}
                             >
                                 <ExternalLink size={14}/>
@@ -251,7 +251,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({project, onViewDetails, viewMo
                         )}
                         {project.repositoryUrl && (
                             <button
-                                className={`flex items-center justify-center space-x-2 ${themeClasses.button.secondary} text-sm py-2.5 hover:scale-[1.02] transition-all duration-200`}
+                                className={`flex items-center justify-center space-x-2 ${themeClasses.button.secondary} text-sm py-2.5 hover:scale-[1.02] transition-all duration-200 ${!(project.demoUrl && project.repositoryUrl) ? 'w-full' : ''}`}
                                 onClick={() => window.open(project.repositoryUrl, '_blank')}
                             >
                                 <Github size={14}/>
