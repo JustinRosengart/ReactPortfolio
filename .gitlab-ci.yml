@@ -1,0 +1,101 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  NODE_VERSION: "20"
+  BUILD_DIR: "build"
+
+# Cache node_modules for faster builds
+cache:
+  paths:
+    - node_modules/
+    - .npm/
+
+# Test stage - runs on all branches and merge requests
+test:
+  stage: test
+  image: node:${NODE_VERSION}
+  script:
+    - npm ci --cache .npm --prefer-offline
+    - npm run test -- --coverage --ci --testResultsProcessor=jest-junit --coverageReporters=cobertura --coverageReporters=lcov --coverageReporters=text-summary
+  artifacts:
+    when: always
+    paths:
+      - coverage/
+    reports:
+      junit: junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+    expire_in: 1 week
+  coverage: '/Lines\s*:\s*(\d+\.\d+)%/'
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+# Lint stage - runs on all branches and merge requests
+lint:
+  stage: test
+  image: node:${NODE_VERSION}
+  script:
+    - npm ci --cache .npm --prefer-offline
+    - npm run build # Ensure TypeScript compilation passes
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+build:
+  stage: build
+  image: node:${NODE_VERSION}
+  script:
+    - npm ci --cache .npm --prefer-offline
+    - npm run build
+  artifacts:
+    paths:
+      - ${BUILD_DIR}/
+    expire_in: 1 hour
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+deploy_production:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client rsync
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
+  script:
+    - |
+      # 1. Temporär die Rechte an den Deploy-User übergeben, damit rsync schreiben kann
+      ssh $SERVER_USER@$SERVER_HOST "
+        sudo chown -R $SERVER_USER:$SERVER_USER $DEPLOY_PATH
+      "
+    - |
+      # 2. Dateien synchronisieren (das wird jetzt funktionieren)
+      rsync -avz --delete \
+        --exclude='.git*' \
+        --exclude='node_modules' \
+        ${BUILD_DIR}/ $SERVER_USER@$SERVER_HOST:$DEPLOY_PATH/
+    - |
+      # 3. Finale Rechte an den Webserver übergeben und Server neu laden
+      ssh $SERVER_USER@$SERVER_HOST "
+        sudo chown -R www-data:www-data $DEPLOY_PATH
+        sudo chmod -R 755 $DEPLOY_PATH
+        # Optional: Feingranulare Rechte für Dateien und Ordner setzen
+        # sudo find $DEPLOY_PATH -type d -exec chmod 755 {} \;
+        # sudo find $DEPLOY_PATH -type f -exec chmod 644 {} \;
+        sudo systemctl reload apache2
+      "
+  dependencies:
+    - build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+  environment:
+    name: production
+    url: https://ddineva.de
