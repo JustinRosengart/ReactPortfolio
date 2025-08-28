@@ -32,8 +32,7 @@ const ProfilePage: React.FC = () => {
 
                     {/* Skills */}
                     <div className="mb-12">
-                        <h2 className={`text-2xl font-bold ${themeClasses.text.primaryDark} text-center mb-8`}>Top
-                            Skills</h2>
+                        <h2 className={`text-2xl font-bold ${themeClasses.text.primaryDark} text-center mb-8`}>Top Skills</h2>
                         <div className="flex flex-wrap justify-center gap-3">
                             {personalInfo.topSkills.map((skill) => (
                                 <span key={skill}

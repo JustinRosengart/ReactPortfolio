@@ -2,6 +2,7 @@ import React from 'react';
 import {ArrowLeft} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {personalInfo, termsOfServiceContent} from '../data/personal';
+import { themeClasses } from '../config/theme';
 
 const TermsOfServicePage: React.FC = () => {
     const navigate = useNavigate();
@@ -11,22 +12,22 @@ const TermsOfServicePage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+        <div className={`min-h-screen ${themeClasses.bg.primaryLighter} transition-colors duration-200`}>
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 {/* Back Button */}
                 <button
                     onClick={handleBack}
-                    className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors mb-8"
+                    className={`flex items-center space-x-2 ${themeClasses.text.primaryLight} ${themeClasses.text.primaryHover} mb-8`}
                 >
                     <ArrowLeft size={20}/>
                     <span>Back</span>
                 </button>
 
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-8 transition-colors duration-200">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Terms of Service</h1>
+                <div className={`${themeClasses.card.base} p-8`}>
+                    <h1 className={`text-3xl font-bold ${themeClasses.text.primaryDark} mb-8`}>Terms of Service</h1>
 
-                    <div className="prose prose-gray dark:prose-invert max-w-none">
-                        <p className="text-gray-600 dark:text-gray-300 mb-6">
+                    <div className="prose max-w-none">
+                        <p className={`${themeClasses.text.primaryLight} mb-6`}>
                             <strong>Last updated:</strong> {termsOfServiceContent.lastUpdated}
                         </p>
 
@@ -36,7 +37,7 @@ const TermsOfServicePage: React.FC = () => {
                                     return content.map((item, itemIndex) => {
                                         if (item.startsWith('•')) {
                                             return (
-                                                <li key={itemIndex} className="text-gray-700 dark:text-gray-300">
+                                                <li key={itemIndex} className={`${themeClasses.text.primaryLight}`}>
                                                     {item.substring(2)}
                                                 </li>
                                             );
@@ -44,13 +45,13 @@ const TermsOfServicePage: React.FC = () => {
                                             return <div key={itemIndex} className="mb-4"/>;
                                         } else {
                                             return (
-                                                <p key={itemIndex} className="text-gray-700 dark:text-gray-300 mb-4">
+                                                <p key={itemIndex} className={`${themeClasses.text.primaryLight} mb-4`}>
                                                     {item.includes(personalInfo.email) ? (
                                                         <>
                                                             {item.split(personalInfo.email)[0]}
                                                             <a
                                                                 href={`mailto:${personalInfo.email}`}
-                                                                className="text-purple-600 dark:text-purple-400 hover:underline"
+                                                                className={`${themeClasses.text.primary} ${themeClasses.text.primaryHover} underline`}
                                                             >
                                                                 {personalInfo.email}
                                                             </a>
@@ -65,13 +66,13 @@ const TermsOfServicePage: React.FC = () => {
                                     });
                                 } else {
                                     return (
-                                        <p className="text-gray-700 dark:text-gray-300 mb-4">
+                                        <p className={`${themeClasses.text.primaryLight} mb-4`}>
                                             {content.includes(personalInfo.email) ? (
                                                 <>
                                                     {content.split(personalInfo.email)[0]}
                                                     <a
                                                         href={`mailto:${personalInfo.email}`}
-                                                        className="text-purple-600 dark:text-purple-400 hover:underline"
+                                                        className={`${themeClasses.text.primary} ${themeClasses.text.primaryHover} underline`}
                                                     >
                                                         {personalInfo.email}
                                                     </a>
