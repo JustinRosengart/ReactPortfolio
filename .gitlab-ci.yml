@@ -85,8 +85,6 @@ deploy_production:
       # Deployment-Verzeichnis vorbereiten
       ssh $SERVER_USER@$SERVER_HOST "
         sudo /bin/mkdir -p $DEPLOY_PATH
-        # Dieser chown ist temporär, damit rsync schreiben kann
-        sudo /bin/chown -R $SERVER_USER:$SERVER_USER $DEPLOY_PATH
         echo 'Deploy-Verzeichnis vorbereitet'
       "
     - |
