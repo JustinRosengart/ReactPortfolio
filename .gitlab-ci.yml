@@ -29,12 +29,10 @@ compress_images:
   stage: optimize
   image: alpine:latest
   before_script:
-    # Install image optimization tools
     - apk add --no-cache jpegoptim optipng nodejs npm
     - npm install -g svgo
   script:
     - echo "Suche und komprimiere Bilder im Build-Verzeichnis..."
-    # Finde alle Bilder im Build-Ordner und komprimiere sie verlustfrei
     - |
       find ${BUILD_DIR} -type f -regex ".*\.\(jpg\|jpeg\|png\|svg\)" -print0 | while IFS= read -r -d '' file; do
         echo "Komprimiere: $file"
@@ -52,7 +50,6 @@ compress_images:
       done
     - echo "Kompression abgeschlossen."
   artifacts:
-    # Gib den Build-Ordner mit den komprimierten Bildern an den nächsten Job weiter
     paths:
       - ${BUILD_DIR}/
     expire_in: 1 hour
@@ -76,15 +73,16 @@ deploy_production:
       # Backup des aktuellen Deployments erstellen
       ssh $SERVER_USER@$SERVER_HOST "
         if [ -d '$DEPLOY_PATH' ]; then
-          sudo cp -r $DEPLOY_PATH ${DEPLOY_PATH}_backup_\$(date +%Y%m%d_%H%M%S)
+          sudo /bin/cp -r $DEPLOY_PATH ${DEPLOY_PATH}_backup_\$(date +%Y%m%d_%H%M%S)
           echo 'Backup erstellt'
         fi
       "
     - |
       # Deployment-Verzeichnis vorbereiten
       ssh $SERVER_USER@$SERVER_HOST "
-        sudo mkdir -p $DEPLOY_PATH
-        sudo chown -R $SERVER_USER:$SERVER_USER $DEPLOY_PATH
+        sudo /bin/mkdir -p $DEPLOY_PATH
+        # Dieser chown ist temporär, damit rsync schreiben kann
+        sudo /bin/chown -R $SERVER_USER:$SERVER_USER $DEPLOY_PATH
         echo 'Deploy-Verzeichnis vorbereitet'
       "
     - |
@@ -92,33 +90,24 @@ deploy_production:
       rsync -avz --delete \
         --exclude='.git*' \
         --exclude='node_modules' \
-        --exclude='*.log' \
         ${BUILD_DIR}/ $SERVER_USER@$SERVER_HOST:$DEPLOY_PATH/
       
       echo "Dateien erfolgreich übertragen"
     - |
-      # Finale Konfiguration
+      # Finale Konfiguration mit absoluten Pfaden
       ssh $SERVER_USER@$SERVER_HOST "
-        # Webserver-Rechte setzen
-        sudo chown -R www-data:www-data $DEPLOY_PATH
-        sudo chmod -R 755 $DEPLOY_PATH
+        sudo /bin/chown -R www-data:www-data $DEPLOY_PATH
+        sudo /bin/chmod -R 755 $DEPLOY_PATH
+        sudo /bin/systemctl reload apache2
       
-        # Apache neu laden
-        sudo systemctl reload apache2
-      
-        # Status überprüfen
-        if sudo systemctl is-active --quiet apache2; then
+        if sudo /bin/systemctl is-active --quiet apache2; then
           echo '✅ Deployment erfolgreich - Apache läuft'
         else
           echo '❌ Apache-Problem!'
           exit 1
         fi
-      
-        echo 'Deployed files:'
-        ls -la $DEPLOY_PATH | head -5
       "
   dependencies:
-    # Hängt jetzt vom compress_images-Job ab, um die optimierten Artefakte zu erhalten
     - compress_images
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
@@ -150,12 +139,12 @@ rollback_production:
       
         echo \"Rollback zu: \$BACKUP\"
       
-        # Rollback durchführen
-        sudo mv $DEPLOY_PATH ${DEPLOY_PATH}_broken_\$(date +%Y%m%d_%H%M%S)
-        sudo mv \"\$BACKUP\" $DEPLOY_PATH
-        sudo chown -R www-data:www-data $DEPLOY_PATH
-        sudo chmod -R 755 $DEPLOY_PATH
-        sudo systemctl reload apache2
+        # Rollback durchführen mit absoluten Pfaden
+        sudo /bin/mv $DEPLOY_PATH ${DEPLOY_PATH}_broken_\$(date +%Y%m%d_%H%M%S)
+        sudo /bin/mv \"\$BACKUP\" $DEPLOY_PATH
+        sudo /bin/chown -R www-data:www-data $DEPLOY_PATH
+        sudo /bin/chmod -R 755 $DEPLOY_PATH
+        sudo /bin/systemctl reload apache2
       
         echo '✅ Rollback erfolgreich abgeschlossen'
       "
