@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
-import {Linkedin, Mail} from 'lucide-react';
+import {Linkedin, Mail, CheckCircle, XCircle} from 'lucide-react';
+import emailjs from '@emailjs/browser';
 import {ContactFormData} from '../types';
 import {contactInfo, personalInfo} from '../data/personal';
 import {pageContent} from '../data/website';
@@ -11,9 +12,55 @@ const ContactPage: React.FC = () => {
         email: '',
         message: ''
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+    const [submitMessage, setSubmitMessage] = useState('');
 
-    const handleSubmit = () => {
-        console.log('Form submitted:', formData);
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        if (!formData.name || !formData.email || !formData.message) {
+            setSubmitStatus('error');
+            setSubmitMessage('Please fill in all fields.');
+            return;
+        }
+
+        const serviceId = process.env.REACT_APP_EMAILJS_SERVICE_ID;
+        const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
+        const publicKey = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
+
+        if (!serviceId || !templateId || !publicKey) {
+            setSubmitStatus('error');
+            setSubmitMessage('EmailJS is not configured. Please contact the administrator.');
+            return;
+        }
+
+        setIsSubmitting(true);
+        setSubmitStatus('idle');
+
+        try {
+            await emailjs.send(
+                serviceId,
+                templateId,
+                {
+                    from_name: formData.name,
+                    from_email: formData.email,
+                    message: formData.message,
+                    from_website: window.location.hostname
+                },
+                publicKey
+            );
+            
+            setSubmitStatus('success');
+            setSubmitMessage('Message sent successfully! I will get back to you soon.');
+            setFormData({ name: '', email: '', message: '' });
+        } catch (error) {
+            console.error('EmailJS Error:', error);
+            setSubmitStatus('error');
+            setSubmitMessage('Failed to send message. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -117,11 +164,33 @@ const ContactPage: React.FC = () => {
                                 ></textarea>
                             </div>
 
+                            {submitStatus !== 'idle' && (
+                                <div className={`p-4 rounded-md flex items-center space-x-2 ${
+                                    submitStatus === 'success' 
+                                        ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' 
+                                        : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
+                                }`}>
+                                    {submitStatus === 'success' ? (
+                                        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                                    ) : (
+                                        <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                                    )}
+                                    <span className={`text-sm ${
+                                        submitStatus === 'success' 
+                                            ? 'text-green-800 dark:text-green-200' 
+                                            : 'text-red-800 dark:text-red-200'
+                                    }`}>
+                                        {submitMessage}
+                                    </span>
+                                </div>
+                            )}
+
                             <button
                                 onClick={handleSubmit}
-                                className={`w-full ${themeClasses.button.primary}`}
+                                disabled={isSubmitting}
+                                className={`w-full ${themeClasses.button.primary} disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
                             >
-                                {pageContent.contact.formLabels.submit}
+                                {isSubmitting ? 'Sending...' : pageContent.contact.formLabels.submit}
                             </button>
                         </div>
                     </div>

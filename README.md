@@ -5,8 +5,10 @@ This project is a template for creating a personal portfolio website using React
 ## Features
 - Modular structure for personal information and projects
 - Easy configuration for website title and icon
+- Functional contact form with EmailJS integration
 - Automated testing, linting, and deployment via GitLab CI/CD
 - Responsive design with Tailwind CSS
+- Dark mode support
 
 ## Getting Started
 
@@ -25,7 +27,11 @@ Edit the files in `src/data/` to add your personal information and projects:
 
 All example data is provided in English. Replace the example entries with your own information.
 
-### 3. Run locally
+### 3. Set up contact form (optional)
+To enable the functional contact form, follow the setup guide:
+📧 **[EmailJS Setup Guide](./docs/EMAILJS_SETUP.md)**
+
+### 4. Run locally
 Start the development server:
 
 ```
@@ -53,6 +59,9 @@ You can set these variables in GitLab under **Settings > CI/CD > Variables**.
 ## Deployment
 
 Once the CI/CD variables are set, every push to the repository will trigger the pipeline. On successful build, the portfolio will be deployed to your server via SSH.
+
+## Documentation
+- 📧 [EmailJS Contact Form Setup](./docs/EMAILJS_SETUP.md)
 
 ## Learn More
 - [React documentation](https://reactjs.org/)
