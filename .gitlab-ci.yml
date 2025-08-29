@@ -70,6 +70,10 @@ deploy_production:
     - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
   script:
     - |
+      echo "--- Führe Sudo-Rechte-Diagnose aus ---"
+      ssh $SERVER_USER@$SERVER_HOST "sudo -l -U $SERVER_USER"
+      echo "--- Diagnose abgeschlossen ---"
+    - |
       # Backup des aktuellen Deployments erstellen
       ssh $SERVER_USER@$SERVER_HOST "
         if [ -d '$DEPLOY_PATH' ]; then
