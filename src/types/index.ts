@@ -24,7 +24,7 @@ export interface Project {
 export interface NavItem {
     id: string;
     label: string;
-    icon: React.ComponentType<{ size?: number }>;
+    icon: React.ComponentType<{ size?: string | number }>;
 }
 
 export interface ContactFormData {
@@ -44,7 +44,7 @@ export interface Experience {
     duration?: string;
     description?: string;
     skills: string[];
-    icon?: React.ComponentType<{ size?: number }>;
+    icon?: React.ComponentType<{ size?: string | number }>;
 }
 
 export interface Education {
@@ -57,7 +57,7 @@ export interface Education {
     grade?: string;
     description?: string;
     skills: string[];
-    icon?: React.ComponentType<{ size?: number }>;
+    icon?: React.ComponentType<{ size?: string | number }>;
 }
 
 export interface Certification {
@@ -70,7 +70,7 @@ export interface Certification {
     credentialUrl?: string;
     description?: string;
     experiences?: string;
-    icon?: React.ComponentType<{ size?: number }>;
+    icon?: React.ComponentType<{ size?: string | number }>;
 }
 
 export interface PersonalInfo {

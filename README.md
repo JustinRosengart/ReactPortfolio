@@ -15,7 +15,7 @@ This project is a template for creating a personal portfolio website using React
 ### 1. Install dependencies
 Run the following command in the project directory:
 
-```
+```bash
 npm install
 ```
 
@@ -34,7 +34,7 @@ To enable the functional contact form, follow the setup guide:
 ### 4. Run locally
 Start the development server:
 
-```
+```bash
 npm start
 ```
 
