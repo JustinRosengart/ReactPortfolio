@@ -23,10 +23,11 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "npm run generate-manifests && react-scripts start",
-    "build": "npm run generate-manifests && react-scripts build",
+    "start": "npm run optimize-images && npm run generate-manifests && react-scripts start",
+    "build": "npm run optimize-images && npm run generate-manifests && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "optimize-images": "node scripts/optimizeImages.js",
     "generate-manifests": "node scripts/generateImageManifests.js"
   },
   "eslintConfig": {
@@ -68,6 +69,7 @@
   },
   "devDependencies": {
     "@types/react-helmet": "^6.1.11",
-    "jest-junit": "^16.0.0"
+    "jest-junit": "^16.0.0",
+    "sharp": "^0.34.3"
   }
 }

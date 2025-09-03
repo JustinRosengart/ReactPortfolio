@@ -77,6 +77,7 @@ const ProjectGallery: React.FC<ProjectGalleryProps> = ({ project, projectTitle }
                         src={images[0]}
                         alt={`${projectTitle} screenshot`}
                         className="w-full h-full object-cover object-top rounded-lg"
+                        loading="lazy"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
                         <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" size={32} />
@@ -96,6 +97,7 @@ const ProjectGallery: React.FC<ProjectGalleryProps> = ({ project, projectTitle }
                                 src={images[0]}
                                 alt={`${projectTitle} screenshot`}
                                 className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                                loading="lazy"
                                 onClick={(e) => e.stopPropagation()}
                             />
                         </div>
@@ -113,6 +115,7 @@ const ProjectGallery: React.FC<ProjectGalleryProps> = ({ project, projectTitle }
                         src={images[currentIndex]}
                         alt={`${projectTitle} screenshot ${currentIndex + 1}`}
                         className="w-full h-full object-cover object-top rounded-lg"
+                        loading="lazy"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
                         <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" size={32} />
@@ -167,6 +170,7 @@ const ProjectGallery: React.FC<ProjectGalleryProps> = ({ project, projectTitle }
                             src={images[currentIndex]}
                             alt={`${projectTitle} screenshot ${currentIndex + 1}`}
                             className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                            loading="lazy"
                             onClick={(e) => e.stopPropagation()}
                         />
 
