@@ -1,0 +1,172 @@
+import React, { useState } from 'react';
+import { ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react';
+import { themeClasses } from '../config/theme';
+
+interface ProjectGalleryProps {
+    images: string[];
+    projectTitle: string;
+}
+
+const ProjectGallery: React.FC<ProjectGalleryProps> = ({ images, projectTitle }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const nextImage = () => {
+        setCurrentIndex((prev) => (prev + 1) % images.length);
+    };
+
+    const prevImage = () => {
+        setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+    };
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
+    if (!images || images.length === 0) {
+        return null;
+    }
+
+    if (images.length === 1) {
+        return (
+            <div className={`${themeClasses.card.base} shadow-lg p-8 mb-8`}>
+                <div className={`${themeClasses.bg.subtle} rounded-lg overflow-hidden h-96 transition-colors duration-200 relative group cursor-pointer`} onClick={openModal}>
+                    <img
+                        src={images[0]}
+                        alt={`${projectTitle} screenshot`}
+                        className="w-full h-full object-cover object-top rounded-lg"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                        <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" size={32} />
+                    </div>
+                </div>
+                
+                {isModalOpen && (
+                    <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4" onClick={closeModal}>
+                        <div className="relative max-w-4xl max-h-full">
+                            <button
+                                onClick={closeModal}
+                                className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors"
+                            >
+                                <X size={32} />
+                            </button>
+                            <img
+                                src={images[0]}
+                                alt={`${projectTitle} screenshot`}
+                                className="max-w-full max-h-full object-contain rounded-lg"
+                                onClick={(e) => e.stopPropagation()}
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <div className={`${themeClasses.card.base} shadow-lg p-8 mb-8`}>
+            <div className="relative">
+                <div className={`${themeClasses.bg.subtle} rounded-lg overflow-hidden h-96 transition-colors duration-200 relative group cursor-pointer`} onClick={openModal}>
+                    <img
+                        src={images[currentIndex]}
+                        alt={`${projectTitle} screenshot ${currentIndex + 1}`}
+                        className="w-full h-full object-cover object-top rounded-lg"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                        <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" size={32} />
+                    </div>
+                </div>
+
+                {images.length > 1 && (
+                    <>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                            className={`absolute left-2 top-1/2 transform -translate-y-1/2 ${themeClasses.button.primary} p-2 rounded-full shadow-lg opacity-80 hover:opacity-100 transition-opacity`}
+                        >
+                            <ChevronLeft size={20} />
+                        </button>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                            className={`absolute right-2 top-1/2 transform -translate-y-1/2 ${themeClasses.button.primary} p-2 rounded-full shadow-lg opacity-80 hover:opacity-100 transition-opacity`}
+                        >
+                            <ChevronRight size={20} />
+                        </button>
+                    </>
+                )}
+            </div>
+
+            {images.length > 1 && (
+                <div className="flex justify-center mt-4 space-x-2">
+                    {images.map((_, index) => (
+                        <button
+                            key={index}
+                            onClick={() => setCurrentIndex(index)}
+                            className={`w-3 h-3 rounded-full transition-colors duration-200 ${
+                                index === currentIndex
+                                    ? themeClasses.bg.primary
+                                    : themeClasses.bg.primaryLight
+                            }`}
+                        />
+                    ))}
+                </div>
+            )}
+
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4" onClick={closeModal}>
+                    <div className="relative max-w-6xl max-h-full">
+                        <button
+                            onClick={closeModal}
+                            className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors z-10"
+                        >
+                            <X size={32} />
+                        </button>
+                        
+                        <img
+                            src={images[currentIndex]}
+                            alt={`${projectTitle} screenshot ${currentIndex + 1}`}
+                            className="max-w-full max-h-full object-contain rounded-lg"
+                            onClick={(e) => e.stopPropagation()}
+                        />
+
+                        {images.length > 1 && (
+                            <>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all"
+                                >
+                                    <ChevronLeft size={24} />
+                                </button>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all"
+                                >
+                                    <ChevronRight size={24} />
+                                </button>
+
+                                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                                    {images.map((_, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={(e) => { e.stopPropagation(); setCurrentIndex(index); }}
+                                            className={`w-3 h-3 rounded-full transition-colors duration-200 ${
+                                                index === currentIndex
+                                                    ? 'bg-white'
+                                                    : 'bg-white bg-opacity-50'
+                                            }`}
+                                        />
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default ProjectGallery;

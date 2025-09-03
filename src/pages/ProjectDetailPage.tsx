@@ -3,6 +3,7 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {ArrowLeft, CheckCircle, ExternalLink, Github} from 'lucide-react';
 import {projects} from '../data/projects';
 import { themeClasses } from '../config/theme';
+import ProjectGallery from '../components/ProjectGallery';
 
 // React Markdown with custom components for styling
 import ReactMarkdown from 'react-markdown';
@@ -216,21 +217,12 @@ const ProjectDetailPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Project Image/Mockup */}
+                    {/* Project Gallery */}
                     <div className="lg:order-first">
-                        <div
-                            className={`${themeClasses.card.base} shadow-lg p-8 mb-8`}>
-                            <div
-                                className={`${themeClasses.bg.subtle} rounded-lg overflow-hidden h-96 transition-colors duration-200`}>
-                                {project.image && (
-                                    <img
-                                        src={project.image}
-                                        alt={`${project.title} screenshot`}
-                                        className="w-full h-full object-cover rounded-lg"
-                                    />
-                                )}
-                            </div>
-                        </div>
+                        <ProjectGallery 
+                            images={project.images && project.images.length > 0 ? project.images : [project.image]}
+                            projectTitle={project.title}
+                        />
 
                         {/* Project Stats Card */}
                         <div
