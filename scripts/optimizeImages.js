@@ -8,31 +8,70 @@ const isImageFile = (filename) => {
     return imageExtensions.includes(ext);
 };
 
-const optimizeImage = async (inputPath, outputPath) => {
+const optimizeImage = async (imagePath) => {
     try {
-        const stats = fs.statSync(inputPath);
+        const stats = fs.statSync(imagePath);
         const fileSizeKB = Math.round(stats.size / 1024);
         
         // Skip if already optimized (small file)
         if (fileSizeKB < 200) {
-            console.log(`Skipping ${path.basename(inputPath)} (${fileSizeKB}KB - already optimized)`);
+            console.log(`Skipping ${path.basename(imagePath)} (${fileSizeKB}KB - already optimized)`);
             return;
         }
 
-        await sharp(inputPath)
-            .webp({ 
-                quality: 85,
-                effort: 6
-            })
-            .toFile(outputPath);
-
-        const outputStats = fs.statSync(outputPath);
-        const outputSizeKB = Math.round(outputStats.size / 1024);
-        const reduction = Math.round(((stats.size - outputStats.size) / stats.size) * 100);
+        const ext = path.extname(imagePath).toLowerCase();
+        const tempPath = imagePath + '.temp';
         
-        console.log(`✅ ${path.basename(inputPath)}: ${fileSizeKB}KB → ${outputSizeKB}KB (-${reduction}%)`);
+        let sharpInstance = sharp(imagePath);
+        
+        // Optimize based on original format
+        switch (ext) {
+            case '.png':
+                sharpInstance = sharpInstance.png({ 
+                    quality: 85,
+                    compressionLevel: 9,
+                    palette: true
+                });
+                break;
+            case '.jpg':
+            case '.jpeg':
+                sharpInstance = sharpInstance.jpeg({ 
+                    quality: 85,
+                    progressive: true
+                });
+                break;
+            case '.webp':
+                sharpInstance = sharpInstance.webp({ 
+                    quality: 85,
+                    effort: 6
+                });
+                break;
+            default:
+                console.log(`Skipping ${path.basename(imagePath)} - unsupported format for optimization`);
+                return;
+        }
+
+        await sharpInstance.toFile(tempPath);
+        
+        const tempStats = fs.statSync(tempPath);
+        const outputSizeKB = Math.round(tempStats.size / 1024);
+        
+        // Only replace if optimization actually reduced size
+        if (tempStats.size < stats.size) {
+            fs.renameSync(tempPath, imagePath);
+            const reduction = Math.round(((stats.size - tempStats.size) / stats.size) * 100);
+            console.log(`✅ ${path.basename(imagePath)}: ${fileSizeKB}KB → ${outputSizeKB}KB (-${reduction}%)`);
+        } else {
+            fs.unlinkSync(tempPath);
+            console.log(`Keeping original ${path.basename(imagePath)} (optimization didn't reduce size)`);
+        }
     } catch (error) {
-        console.error(`❌ Failed to optimize ${inputPath}:`, error.message);
+        console.error(`❌ Failed to optimize ${imagePath}:`, error.message);
+        // Clean up temp file if it exists
+        const tempPath = imagePath + '.temp';
+        if (fs.existsSync(tempPath)) {
+            fs.unlinkSync(tempPath);
+        }
     }
 };
 
@@ -53,16 +92,8 @@ const optimizeFolder = async (folderPath) => {
         }
 
         for (const file of imageFiles) {
-            const inputPath = path.join(folderPath, file);
-            const fileName = path.parse(file).name;
-            const outputPath = path.join(folderPath, `${fileName}.webp`);
-            
-            // Skip if optimized version already exists
-            if (fs.existsSync(outputPath)) {
-                continue;
-            }
-            
-            await optimizeImage(inputPath, outputPath);
+            const imagePath = path.join(folderPath, file);
+            await optimizeImage(imagePath);
         }
         
         console.log(`✅ Completed optimization for ${imageFiles.length} images`);
