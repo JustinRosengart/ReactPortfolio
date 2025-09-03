@@ -77,7 +77,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({project, onViewDetails, viewMo
                                 <img
                                     src={project.imageBanner}
                                     alt={`${project.title} screenshot`}
-                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
                                 />
                             ) : (
                                 <div className={`text-center ${themeClasses.text.secondary}`}>
@@ -169,7 +169,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({project, onViewDetails, viewMo
                         <img
                             src={project.imageBanner}
                             alt={`${project.title} screenshot`}
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
                         />
                     ) : (
                         <div className={`text-center ${themeClasses.text.secondary}`}>

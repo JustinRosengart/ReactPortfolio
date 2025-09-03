@@ -16,6 +16,7 @@ export interface Project {
     repositoryUrl?: string;
     image: string;
     imageBanner: string;
+    images?: string[];
     additionalInfo: string;
     status: 'completed' | 'in-progress' | 'planned' | 'blocked';
     type: string;
