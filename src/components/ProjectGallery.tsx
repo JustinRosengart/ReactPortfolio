@@ -1,15 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react';
 import { themeClasses } from '../config/theme';
+import { getProjectImages } from '../utils/imageUtils';
 
 interface ProjectGalleryProps {
-    images: string[];
+    project: { images?: string[], imageFolder?: string, image: string };
     projectTitle: string;
 }
 
-const ProjectGallery: React.FC<ProjectGalleryProps> = ({ images, projectTitle }) => {
+const ProjectGallery: React.FC<ProjectGalleryProps> = ({ project, projectTitle }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [images, setImages] = useState<string[]>([project.image]);
+    
+    useEffect(() => {
+        const loadImages = async () => {
+            const loadedImages = await getProjectImages(project);
+            setImages(loadedImages);
+        };
+        
+        loadImages();
+    }, [project]);
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (!isModalOpen) return;
+            
+            switch (event.key) {
+                case 'Escape':
+                    closeModal();
+                    break;
+                case 'ArrowLeft':
+                    if (images.length > 1) {
+                        prevImage();
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (images.length > 1) {
+                        nextImage();
+                    }
+                    break;
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isModalOpen, images.length]);
 
     const nextImage = () => {
         setCurrentIndex((prev) => (prev + 1) % images.length);
@@ -47,17 +85,17 @@ const ProjectGallery: React.FC<ProjectGalleryProps> = ({ images, projectTitle })
                 
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4" onClick={closeModal}>
+                        <button
+                            onClick={closeModal}
+                            className="fixed top-4 right-4 z-10 text-white hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full p-2"
+                        >
+                            <X size={24} />
+                        </button>
                         <div className="relative max-w-4xl max-h-full">
-                            <button
-                                onClick={closeModal}
-                                className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors"
-                            >
-                                <X size={32} />
-                            </button>
                             <img
                                 src={images[0]}
                                 alt={`${projectTitle} screenshot`}
-                                className="max-w-full max-h-full object-contain rounded-lg"
+                                className="max-w-full max-h-[90vh] object-contain rounded-lg"
                                 onClick={(e) => e.stopPropagation()}
                             />
                         </div>
@@ -117,51 +155,51 @@ const ProjectGallery: React.FC<ProjectGalleryProps> = ({ images, projectTitle })
 
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4" onClick={closeModal}>
+                    <button
+                        onClick={closeModal}
+                        className="fixed top-4 right-4 z-10 text-white hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full p-2"
+                    >
+                        <X size={24} />
+                    </button>
+                    
                     <div className="relative max-w-6xl max-h-full">
-                        <button
-                            onClick={closeModal}
-                            className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors z-10"
-                        >
-                            <X size={32} />
-                        </button>
-                        
                         <img
                             src={images[currentIndex]}
                             alt={`${projectTitle} screenshot ${currentIndex + 1}`}
-                            className="max-w-full max-h-full object-contain rounded-lg"
+                            className="max-w-full max-h-[90vh] object-contain rounded-lg"
                             onClick={(e) => e.stopPropagation()}
                         />
 
-                        {images.length > 1 && (
-                            <>
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); prevImage(); }}
-                                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all"
-                                >
-                                    <ChevronLeft size={24} />
-                                </button>
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); nextImage(); }}
-                                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all"
-                                >
-                                    <ChevronRight size={24} />
-                                </button>
+                    {images.length > 1 && (
+                        <>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                                className={`fixed left-4 top-1/2 transform -translate-y-1/2 ${themeClasses.button.primary} p-3 rounded-full shadow-lg z-10 transition-all duration-200`}
+                            >
+                                <ChevronLeft size={24} />
+                            </button>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                                className={`fixed right-4 top-1/2 transform -translate-y-1/2 ${themeClasses.button.primary} p-3 rounded-full shadow-lg z-10 transition-all duration-200`}
+                            >
+                                <ChevronRight size={24} />
+                            </button>
 
-                                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                                    {images.map((_, index) => (
-                                        <button
-                                            key={index}
-                                            onClick={(e) => { e.stopPropagation(); setCurrentIndex(index); }}
-                                            className={`w-3 h-3 rounded-full transition-colors duration-200 ${
-                                                index === currentIndex
-                                                    ? 'bg-white'
-                                                    : 'bg-white bg-opacity-50'
-                                            }`}
-                                        />
-                                    ))}
-                                </div>
-                            </>
-                        )}
+                            <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+                                {images.map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={(e) => { e.stopPropagation(); setCurrentIndex(index); }}
+                                        className={`w-3 h-3 rounded-full transition-colors duration-200 ${
+                                            index === currentIndex
+                                                ? 'bg-white'
+                                                : 'bg-white bg-opacity-50'
+                                        }`}
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    )}
                     </div>
                 </div>
             )}

@@ -220,7 +220,7 @@ const ProjectDetailPage: React.FC = () => {
                     {/* Project Gallery */}
                     <div className="lg:order-first">
                         <ProjectGallery 
-                            images={project.images && project.images.length > 0 ? project.images : [project.image]}
+                            project={project}
                             projectTitle={project.title}
                         />
 
