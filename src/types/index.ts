@@ -17,6 +17,7 @@ export interface Project {
     image: string;
     imageBanner: string;
     images?: string[];
+    imageFolder?: string;
     additionalInfo: string;
     status: 'completed' | 'in-progress' | 'planned' | 'blocked';
     type: string;
