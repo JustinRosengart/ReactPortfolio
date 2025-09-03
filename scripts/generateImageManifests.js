@@ -7,18 +7,6 @@ const isImageFile = (filename) => {
     return imageExtensions.includes(ext);
 };
 
-const getOptimizedImagePath = (imagePath) => {
-    const parsed = path.parse(imagePath);
-    const webpPath = `${parsed.dir}/${parsed.name}.webp`.replace(/\\/g, '/');
-    const fullWebpPath = path.join(process.cwd(), 'public', webpPath.substring(1));
-    
-    // Check if optimized WebP version exists
-    if (fs.existsSync(fullWebpPath)) {
-        return webpPath;
-    }
-    return imagePath;
-};
-
 const generateManifestForFolder = (folderPath, relativePath) => {
     try {
         if (!fs.existsSync(folderPath)) {
@@ -28,12 +16,9 @@ const generateManifestForFolder = (folderPath, relativePath) => {
         const files = fs.readdirSync(folderPath);
         const imageFiles = files
             .filter(isImageFile)
-            .filter(file => !file.endsWith('.webp') || !files.includes(file.replace('.webp', '.png')))
+            .filter(file => file !== 'manifest.json')
             .sort()
-            .map(file => {
-                const imagePath = `${relativePath}/${file}`;
-                return getOptimizedImagePath(imagePath);
-            });
+            .map(file => `${relativePath}/${file}`);
 
         if (imageFiles.length > 0) {
             const manifestPath = path.join(folderPath, 'manifest.json');
