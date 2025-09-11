@@ -5,7 +5,7 @@ services:
   webapp:
     # Der Image-Name wird durch die GitLab CI/CD Pipeline gesetzt
     image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}
-    container_name: <NAME>-portfolio
+    container_name: ${$PRODUCTION_URL}-portfolio
     restart: unless-stopped
     ports:
       # Port 8080 des Servers auf Port 80 des Containers mappen
