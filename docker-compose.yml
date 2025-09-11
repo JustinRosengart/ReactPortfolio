@@ -1,5 +1,6 @@
-version: '3.8'
-
+networks:
+  web:
+    external: true
 services:
   webapp:
     # Der Image-Name wird durch die GitLab CI/CD Pipeline gesetzt
@@ -9,3 +10,5 @@ services:
     ports:
       # Port 8080 des Servers auf Port 80 des Containers mappen
       - "8080:80"
+    networks:
+      - web
