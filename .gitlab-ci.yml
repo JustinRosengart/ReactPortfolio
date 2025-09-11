@@ -30,6 +30,8 @@ deploy_production:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
+    - scp docker-compose.yml $SERVER_USER@$SERVER_HOST:/var/www/$PRODUCTION_URL/docker-compose.yml
+    - scp nginx.conf $SERVER_USER@$SERVER_HOST:/var/www/$PRODUCTION_URL/nginx.conf
   script:
     - |
       ssh $SERVER_USER@$SERVER_HOST "
@@ -40,9 +42,9 @@ deploy_production:
         export CI_REGISTRY_IMAGE=${CI_REGISTRY_IMAGE} &&
         export CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA} &&
         echo 'Pulling the latest image...' &&
-        docker-compose pull &&
+        docker compose pull &&
         echo 'Restarting the service...' &&
-        docker-compose up -d &&
+        docker compose up -d &&
         echo 'Deployment successful!'
       "
   rules:
