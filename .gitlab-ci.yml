@@ -40,9 +40,9 @@ deploy_production:
         export CI_REGISTRY_IMAGE=${CI_REGISTRY_IMAGE} &&
         export CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA} &&
         echo 'Pulling the latest image...' &&
-        docker-compose pull &&
+        docker compose pull &&
         echo 'Restarting the service...' &&
-        docker-compose up -d &&
+        docker compose up -d &&
         echo 'Deployment successful!'
       "
   rules:
