@@ -1,85 +1,49 @@
 import React from 'react';
-import {useNavigate} from 'react-router-dom';
-import {Github, Gitlab, Linkedin, Mail, MapPin} from 'lucide-react';
-import {contactInfo, galleryImages, personalInfo} from '../data/personal';
-import {projects} from '../data/projects';
-import {quickLinks} from '../data/website';
+import { Link } from 'react-router-dom';
+import { Github, Linkedin, Twitter, Instagram } from 'lucide-react';
+import { footerContent, quickLinks } from '../data/website';
+import { personalInfo, contactInfo } from '../data/personal';
 import { themeClasses } from '../config/theme';
+import { EditableText } from './Builder/EditableText';
 
 const Footer: React.FC = () => {
-    const navigate = useNavigate();
     const currentYear = new Date().getFullYear();
 
-    const socialLinks = [
-        {
-            name: 'Email',
-            href: `mailto:${personalInfo.email}`,
-            icon: Mail,
-            color: themeClasses.text.accentHover
-        },
-        ...contactInfo.socialLinks.map(link => ({
-            name: link.name,
-            href: link.href,
-            icon: link.name === 'LinkedIn' ? Linkedin : link.name === 'GitHub' ? Github : Gitlab,
-            color: themeClasses.text.accentHover
-        }))
-    ];
-
-    const handleQuickLinkClick = (path: string) => {
-        navigate(path);
+    const socialIcons = {
+        Github,
+        Linkedin,
+        Twitter,
+        Instagram
     };
-
-    const handlePrivacyClick = () => {
-        navigate('/privacy-policy');
-    };
-
-    const handleTermsClick = () => {
-        navigate('/terms-of-service');
-    };
-
-    // Filter quick links based on available content
-    const availableQuickLinks = quickLinks.filter(link => {
-        if (link.path === '/projects') return projects.length > 0;
-        if (link.path === '/gallery') return galleryImages.length > 0;
-        return true;
-    });
 
     return (
-        <footer
-            className={`${themeClasses.sections} border-t ${themeClasses.border.primaryLight}`}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Main Footer Content */}
-                <div className="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {/* About Section */}
-                    <div className="lg:col-span-2">
-                        <div className="flex items-center space-x-3 mb-4">
-                            <span
-                                className={`font-semibold text-lg ${themeClasses.text.accent}`}>{personalInfo.name}
-                            </span>
-                        </div>
-                        <p className={`${themeClasses.text.secondary} mb-4 max-w-md`}>
-                            {personalInfo.tagline}
+        <footer className={`border-t ${themeClasses.border.primaryLight} mt-20`}>
+            <div className="max-w-6xl mx-auto px-4 py-12">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                    {/* Brand */}
+                    <div className="col-span-1 md:col-span-2">
+                        <h3 className={`text-xl font-bold ${themeClasses.text.primary} mb-4`}>
+                            <EditableText value={personalInfo.name} path="personalInfo.name" />
+                        </h3>
+                        <p className={`${themeClasses.text.secondary} mb-6 max-w-sm`}>
+                            <EditableText value={personalInfo.tagline} path="personalInfo.tagline" />
                         </p>
-                        <div className={`flex items-center space-x-4 text-sm ${themeClasses.text.secondary}`}>
-                            <div className="flex items-center space-x-1">
-                                <MapPin size={14}/>
-                                <span>{personalInfo.location.city + ", " + personalInfo.location.country}</span>
-                            </div>
-                        </div>
                     </div>
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className={`font-semibold ${themeClasses.text.accent} mb-4`}>Quick Links</h3>
+                        <h4 className={`font-semibold ${themeClasses.text.primary} mb-4`}>
+                            <EditableText value={footerContent.sections.quickLinks.title} path="footerContent.sections.quickLinks.title" />
+                        </h4>
                         <ul className="space-y-2">
-                            {availableQuickLinks.map((link) => (
+                            {quickLinks.map((link: any) => (
                                 <li key={link.name}>
-                                    <button
-                                        onClick={() => handleQuickLinkClick(link.path)}
-                                        className={`text-sm text-left ${themeClasses.text.secondary} ${themeClasses.text.accentHover}`}
+                                    <a
+                                        href={link.path}
+                                        className={`${themeClasses.text.secondary} ${themeClasses.text.accentHover} transition-colors`}
                                     >
                                         {link.name}
-                                    </button>
+                                    </a>
                                 </li>
                             ))}
                         </ul>
@@ -87,20 +51,25 @@ const Footer: React.FC = () => {
 
                     {/* Connect */}
                     <div>
-                        <h3 className={`font-semibold ${themeClasses.text.accent} mb-4`}>Connect</h3>
-                        <div className="flex space-x-3">
-                            {socialLinks.map((social) => (
-                                <a
-                                    key={social.name}
-                                    href={social.href}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={`w-10 h-10 ${themeClasses.bg.primaryLight} rounded-lg flex items-center justify-center ${themeClasses.text.secondary} transition-colors ${social.color}`}
-                                    aria-label={social.name}
-                                >
-                                    <social.icon size={18}/>
-                                </a>
-                            ))}
+                        <h4 className={`font-semibold ${themeClasses.text.primary} mb-4`}>
+                            <EditableText value={footerContent.sections.connect.title} path="footerContent.sections.connect.title" />
+                        </h4>
+                        <div className="flex space-x-4">
+                            {contactInfo.socialLinks.map((social: any) => {
+                                const Icon = socialIcons[social.icon as keyof typeof socialIcons];
+                                return (
+                                    <a
+                                        key={social.name}
+                                        href={social.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`w-10 h-10 ${themeClasses.bg.primaryLight} rounded-lg flex items-center justify-center ${themeClasses.text.secondary} transition-colors ${social.color}`}
+                                        aria-label={social.name}
+                                    >
+                                        <Icon size={18}/>
+                                    </a>
+                                );
+                            })}
                         </div>
                         <div className="mt-4">
                             <p className={`text-sm ${themeClasses.text.secondary} mb-2`}>Get in touch</p>
@@ -121,18 +90,24 @@ const Footer: React.FC = () => {
                             © {currentYear} {personalInfo.name}. All rights reserved.
                         </div>
                         <div className={`flex space-x-6 text-sm ${themeClasses.text.secondary}`}>
-                            <button
-                                onClick={handlePrivacyClick}
+                            <Link
+                                to="/privacy-policy"
                                 className={themeClasses.text.accentHover}
                             >
                                 Privacy Policy
-                            </button>
-                            <button
-                                onClick={handleTermsClick}
+                            </Link>
+                            <Link
+                                to="/terms-of-service"
                                 className={themeClasses.text.accentHover}
                             >
                                 Terms of Service
-                            </button>
+                            </Link>
+                            <Link
+                                to="/imprint"
+                                className={themeClasses.text.accentHover}
+                            >
+                                Imprint
+                            </Link>
                         </div>
                     </div>
                 </div>

@@ -2,6 +2,7 @@
   "name": "claude-portfolio-test",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:3001",
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@testing-library/dom": "^10.4.1",
@@ -13,6 +14,7 @@
     "@types/react": "^18.3.24",
     "@types/react-dom": "^18.3.7",
     "lucide-react": "^0.539.0",
+    "multer": "^2.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-helmet": "^6.1.0",
@@ -28,7 +30,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "optimize-images": "node scripts/optimizeImages.js",
-    "generate-manifests": "node scripts/generateImageManifests.js"
+    "generate-manifests": "node scripts/generateImageManifests.js",
+    "dev:builder": "concurrently \"set REACT_APP_ENABLE_BUILDER=true&& npm run start\" \"node server/index.js\""
   },
   "eslintConfig": {
     "extends": [
@@ -69,6 +72,10 @@
   },
   "devDependencies": {
     "@types/react-helmet": "^6.1.11",
+    "body-parser": "^2.2.0",
+    "concurrently": "^9.2.1",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
     "jest-junit": "^16.0.0",
     "sharp": "^0.34.3"
   }

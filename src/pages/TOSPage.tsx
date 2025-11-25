@@ -145,7 +145,7 @@ const TermsOfServicePage: React.FC = () => {
                                 </p>
                                 <p className="text-gray-700 dark:text-gray-300">
                                     <>
-                                        <strong>Location:</strong> {personalInfo.location.city}, {personalInfo.location.country}</>
+                                        <strong>Location:</strong> {personalInfo.location}</>
                                 </p>
                             </div>
                         </section>

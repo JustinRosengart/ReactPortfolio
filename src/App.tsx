@@ -13,40 +13,47 @@ import ContactPage from './pages/ContactPage';
 import ProfilePage from './pages/ProfilePage';
 import TOSPage from "./pages/TOSPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import ImprintPage from "./pages/ImprintPage";
 import {Helmet} from "react-helmet";
 import {websiteIcon, websiteTitle} from "./data/website";
+import { BuilderProvider } from './context/BuilderContext';
+import { BuilderPanel } from './components/Builder/BuilderPanel';
 
 const App: React.FC = () => (
     <ThemeProvider>
-        <BrowserRouter>
-            <Helmet>
-                <title>{websiteTitle}</title>
-                <link rel="icon" href={websiteIcon} type="image/x-icon"/>
-            </Helmet>
-            <ScrollToTop/>
-            <div className={`min-h-screen ${themeClasses.app.light} ${themeClasses.app.dark} flex flex-col transition-colors duration-200`}>
-                <Header/>
-                <main className="flex-1">
-                    <Routes>
-                        <Route path="/" element={<LandingPage/>}/>
+        <BuilderProvider>
+            <BrowserRouter>
+                <Helmet>
+                    <title>{websiteTitle}</title>
+                    <link rel="icon" href={websiteIcon} type="image/x-icon"/>
+                </Helmet>
+                <ScrollToTop/>
+                <div className={`min-h-screen ${themeClasses.app.light} ${themeClasses.app.dark} flex flex-col transition-colors duration-200`}>
+                    <Header/>
+                    <main className="flex-1">
+                        <Routes>
+                            <Route path="/" element={<LandingPage/>}/>
 
-                        <Route path="/home" element={<LandingPage/>}/>
-                        <Route path="/projects" element={<ProjectsPage/>}/>
-                        <Route path="/projects/:id" element={<ProjectDetailPage/>}/>
-                        <Route path="/gallery" element={<GalleryPage/>}/>
-                        <Route path="/contact" element={<ContactPage/>}/>
-                        <Route path="/profile" element={<ProfilePage/>}/>
+                            <Route path="/home" element={<LandingPage/>}/>
+                            <Route path="/projects" element={<ProjectsPage/>}/>
+                            <Route path="/projects/:id" element={<ProjectDetailPage/>}/>
+                            <Route path="/gallery" element={<GalleryPage/>}/>
+                            <Route path="/contact" element={<ContactPage/>}/>
+                            <Route path="/profile" element={<ProfilePage/>}/>
 
-                        <Route path="/privacy-policy" element={<PrivacyPolicyPage/>}/>
-                        <Route path="/terms-of-service" element={<TOSPage/>}/>
+                            <Route path="/privacy-policy" element={<PrivacyPolicyPage/>}/>
+                            <Route path="/terms-of-service" element={<TOSPage/>}/>
+                            <Route path="/imprint" element={<ImprintPage/>}/>
 
-                        {/* Catch all route - redirect to about */}
-                        <Route path="*" element={<LandingPage/>}/>
-                    </Routes>
-                </main>
-                <Footer/>
-            </div>
-        </BrowserRouter>
+                            {/* Catch all route - redirect to about */}
+                            <Route path="*" element={<LandingPage/>}/>
+                        </Routes>
+                    </main>
+                    <Footer/>
+                    <BuilderPanel />
+                </div>
+            </BrowserRouter>
+        </BuilderProvider>
     </ThemeProvider>
 );
 

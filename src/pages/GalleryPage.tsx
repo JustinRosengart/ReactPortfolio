@@ -1,14 +1,21 @@
 import React, {useCallback, useState} from 'react';
 import {ChevronLeft, ChevronRight, Eye, Grid, Grid3x3, Play, X} from 'lucide-react';
-import {galleryCategories, galleryImages} from '../data/personal';
-import {pageContent} from '../data/website';
 import {themeClasses} from '../config/theme';
-import {GalleryImage} from '../types';
+import {GalleryImage, GalleryPageContent} from '../types';
+import { useBuilder } from '../context/BuilderContext';
+import { EditableText } from '../components/Builder/EditableText';
+import { EditableImage } from '../components/Builder/EditableImage';
+import { EditableList } from '../components/Builder/EditableList';
 
 const GalleryPage: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('grid');
+    const { content, isBuilderMode } = useBuilder();
+
+    const galleryImages: GalleryImage[] = (content.galleryImages || []) as unknown as GalleryImage[];
+    const galleryCategories = content.galleryCategories || [];
+    const pageContent = content.pageContent as { gallery: GalleryPageContent };
 
     // Filter images based on selected category
     const filteredImages = selectedCategory === 'all'
@@ -16,22 +23,24 @@ const GalleryPage: React.FC = () => {
         : galleryImages.filter(img => img.category === selectedCategory);
 
     // Get categories that actually have images
-    const availableCategories = galleryCategories.filter(category =>
+    const availableCategories = galleryCategories.filter((category: any) =>
         galleryImages.some(img => img.category === category.id)
     );
 
     // Auto-reset category if current selection has no images
     React.useEffect(() => {
-        if (selectedCategory !== 'all' && !availableCategories.some(cat => cat.id === selectedCategory)) {
+        if (selectedCategory !== 'all' && !availableCategories.some((cat: any) => cat.id === selectedCategory)) {
             setSelectedCategory('all');
         }
     }, [selectedCategory, availableCategories]);
 
     // Handle image modal
     const openImageModal = useCallback((image: GalleryImage) => {
-        setSelectedImage(image);
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
-    }, []);
+        if (!isBuilderMode) {
+            setSelectedImage(image);
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+    }, [isBuilderMode]);
 
     const closeImageModal = useCallback(() => {
         setSelectedImage(null);
@@ -81,10 +90,10 @@ const GalleryPage: React.FC = () => {
                 {/* Header */}
                 <div className="text-center mb-12">
                     <h1 className={`text-3xl font-bold ${themeClasses.text.accent} mb-4`}>
-                        {pageContent.gallery.title}
+                        <EditableText value={pageContent.gallery.title} path="pageContent.gallery.title" />
                     </h1>
                     <p className={`${themeClasses.text.secondary} max-w-3xl mx-auto mb-8`}>
-                        {pageContent.gallery.description}
+                        <EditableText value={pageContent.gallery.description} path="pageContent.gallery.description" multiline />
                     </p>
                 </div>
 
@@ -102,11 +111,11 @@ const GalleryPage: React.FC = () => {
                                         : themeClasses.button.secondary
                                 }`}
                             >
-                                {pageContent.gallery.categories.all}
+                                {pageContent.gallery.categories?.all || 'All'}
                             </button>
                         )}
                         {/* Only show categories that have images */}
-                        {availableCategories.map(category => (
+                        {availableCategories.map((category: any) => (
                             <button
                                 key={category.id}
                                 onClick={() => setSelectedCategory(category.id)}
@@ -116,7 +125,7 @@ const GalleryPage: React.FC = () => {
                                         : themeClasses.button.secondary
                                 }`}
                             >
-                                {category.name}
+                                <EditableText value={category.name} path={`galleryCategories.${galleryCategories.findIndex((c: any) => c.id === category.id)}.name`} />
                             </button>
                         ))}
                     </div>
@@ -130,7 +139,7 @@ const GalleryPage: React.FC = () => {
                                     ? `${themeClasses.bg.primary} text-white`
                                     : `${themeClasses.bg.primaryLight} ${themeClasses.text.secondary} ${themeClasses.text.accentHover}`
                             }`}
-                            title={pageContent.gallery.viewModes.grid}
+                            title={pageContent.gallery.viewModes?.grid || 'Grid View'}
                         >
                             <Grid size={20}/>
                         </button>
@@ -141,7 +150,7 @@ const GalleryPage: React.FC = () => {
                                     ? `${themeClasses.bg.primary} text-white`
                                     : `${themeClasses.bg.primaryLight} ${themeClasses.text.secondary} ${themeClasses.text.accentHover}`
                             }`}
-                            title={pageContent.gallery.viewModes.masonry}
+                            title={pageContent.gallery.viewModes?.masonry || 'Masonry View'}
                         >
                             <Grid3x3 size={20}/>
                         </button>
@@ -149,15 +158,30 @@ const GalleryPage: React.FC = () => {
                 </div>
 
                 {/* Gallery Grid */}
-                {filteredImages.length > 0 ? (
-                    <div className={`grid gap-4 ${
+                <EditableList
+                    path="galleryImages"
+                    items={filteredImages}
+                    onAdd={() => ({
+                        id: `image-${Date.now()}`,
+                        title: 'New Image',
+                        description: 'Description',
+                        imagePath: '/assets/placeholder.jpg',
+                        category: selectedCategory === 'all' ? (galleryCategories[0]?.id || 'uncategorized') : selectedCategory,
+                        date: new Date().getFullYear().toString(),
+                        tags: ['new'],
+                        type: 'image' as const
+                    })}
+                    containerClassName={`grid gap-4 ${
                         viewMode === 'grid'
                             ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
                             : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-                    }`}>
-                        {filteredImages.map((image) => (
+                    }`}
+                    renderItem={(image: GalleryImage, index: number) => {
+                        // Find the actual index in the main galleryImages array to ensure correct path
+                        const realIndex = galleryImages.findIndex(img => img.id === image.id);
+                        
+                        return (
                             <div
-                                key={image.id}
                                 className={`${themeClasses.card.base} overflow-hidden ${themeClasses.card.hover} cursor-pointer`}
                                 onClick={() => openImageModal(image)}
                             >
@@ -165,11 +189,11 @@ const GalleryPage: React.FC = () => {
                                 <div className={`relative overflow-hidden ${
                                     viewMode === 'masonry' ? 'aspect-auto' : 'aspect-square'
                                 }`}>
-                                    <img
-                                        src={image.imagePath}
-                                        alt={image.title}
+                                    <EditableImage 
+                                        value={image.imagePath} 
+                                        path={`galleryImages.${realIndex}.imagePath`}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                        loading="lazy"
+                                        alt={image.title}
                                     />
 
                                     {/* Video indicator */}
@@ -180,51 +204,52 @@ const GalleryPage: React.FC = () => {
                                     )}
 
                                     {/* Overlay */}
-                                    <div
-                                        className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+                                    {!isBuilderMode && (
                                         <div
-                                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                            <div className={`${themeClasses.bg.primary} text-white p-3 rounded-full`}>
-                                                {image.type === 'video' ? <Play size={24} fill="currentColor"/> :
-                                                    <Eye size={24}/>}
+                                            className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+                                            <div
+                                                className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                                <div className={`${themeClasses.bg.primary} text-white p-3 rounded-full`}>
+                                                    {image.type === 'video' ? <Play size={24} fill="currentColor"/> :
+                                                        <Eye size={24}/>}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
 
                                 {/* Image Info */}
                                 <div className="p-4">
                                     <h3 className="font-semibold text-gray-900 dark:text-white mb-1 truncate">
-                                        {image.title}
+                                        <EditableText value={image.title} path={`galleryImages.${realIndex}.title`} />
                                     </h3>
                                     {image.description && (
                                         <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                                            {image.description}
+                                            <EditableText value={image.description} path={`galleryImages.${realIndex}.description`} />
                                         </p>
                                     )}
                                     {image.tags && (
                                         <div className="mt-2 flex flex-wrap gap-1">
-                                            {image.tags.slice(0, 3).map((tag) => (
+                                            {image.tags.slice(0, 3).map((tag, tagIndex) => (
                                                 <span
-                                                    key={tag}
+                                                    key={tagIndex}
                                                     className={`text-xs px-2 py-1 rounded-full ${themeClasses.bg.primaryLight} ${themeClasses.text.accent}`}
                                                 >
-                                                    {tag}
+                                                    <EditableText value={tag} path={`galleryImages.${realIndex}.tags.${tagIndex}`} />
                                                 </span>
                                             ))}
                                         </div>
                                     )}
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                ) : (
+                        );
+                    }}
+                />
+                
+                {galleryImages.length === 0 && (
                     <div className="text-center py-16">
                         <p className="text-gray-500 dark:text-gray-400 text-lg">
-                            {galleryImages.length === 0
-                                ? "Gallery is currently being prepared. Please check back soon!"
-                                : "No images found in this category."
-                            }
+                            {pageContent.gallery.emptyState?.message || "Gallery is currently being prepared. Please check back soon!"}
                         </p>
                     </div>
                 )}

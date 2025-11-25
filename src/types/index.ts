@@ -81,7 +81,7 @@ export interface PersonalInfo {
     titleShort: string;
     titleLong: string;
     email: string;
-    location: { city: string; region: string; country: string };
+    location: string;
     tagline: string;
     description: string;
     about: string;
@@ -130,4 +130,20 @@ export interface GalleryCategory {
     name: string;
     description?: string;
     images: GalleryImage[];
+}
+
+export interface GalleryPageContent {
+    title: string;
+    description: string;
+    categories: {
+        all: string;
+        [key: string]: string;
+    };
+    viewModes: {
+        grid: string;
+        masonry: string;
+    };
+    emptyState?: {
+        message: string;
+    };
 }
