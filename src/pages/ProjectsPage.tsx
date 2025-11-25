@@ -255,7 +255,7 @@ const ProjectsPage: React.FC = () => {
                         }
 
                         return (
-                            <div className={`${themeClasses.card.base} overflow-hidden ${themeClasses.card.hover} transition-all duration-300 group`}>
+                            <div className={`${themeClasses.card.base} overflow-hidden ${themeClasses.card.hover} transition-all duration-300 group h-full flex flex-col`}>
                                 {/* Project Image/Preview */}
                                 <div className={`${themeClasses.bg.subtle} p-6 transition-colors duration-200`}>
                                     <div className={`${themeClasses.bg.card} rounded-lg shadow-sm overflow-hidden h-52 flex items-center justify-center transition-all duration-300 group-hover:shadow-lg relative`}>
@@ -281,7 +281,7 @@ const ProjectsPage: React.FC = () => {
                                 </div>
 
                                 {/* Project Content */}
-                                <div className="p-6">
+                                <div className="p-6 flex flex-col flex-1">
                                     {/* Project Title and Status */}
                                     <div className="flex items-start justify-between mb-4">
                                         <h3 className={`text-xl font-bold ${themeClasses.text.accent} flex-1 mr-3 transition-colors duration-200`}>
@@ -312,7 +312,7 @@ const ProjectsPage: React.FC = () => {
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div className="space-y-4">
+                                    <div className="space-y-4 mt-auto">
                                         <button onClick={() => handleViewProject(project.url)} className={`w-full flex items-center justify-center space-x-2 ${themeClasses.button.primary} py-3 font-medium group-hover:shadow-lg transition-all duration-200`}>
                                             <span>View Details</span>
                                             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-200"/>
