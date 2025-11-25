@@ -5,6 +5,7 @@ import {projects} from '../data/projects';
 import {personalInfo, skillsData} from '../data/personal';
 import {pageContent} from '../data/website';
 import { themeClasses } from '../config/theme';
+import { EditableText } from '../components/Builder/EditableText';
 
 const LandingPage: React.FC = () => {
     // Helper function to render icons dynamically based on string
@@ -46,14 +47,24 @@ const LandingPage: React.FC = () => {
                         </div>
                         <div>
                             <h1 className={`text-4xl lg:text-5xl font-bold ${themeClasses.text.primary} mb-6`}>
-                                {personalInfo.name}
+                                <EditableText 
+                                    value={personalInfo.name} 
+                                    path="personalInfo.name" 
+                                />
                             </h1>
                             <p className={`text-lg ${themeClasses.text.secondary} mb-6`}>
-                                {personalInfo.titleShort}
+                                <EditableText 
+                                    value={personalInfo.titleShort} 
+                                    path="personalInfo.titleShort" 
+                                />
                             </p>
-                            <p className={`${themeClasses.text.secondary} leading-relaxed`}>
-                                {personalInfo.about}
-                            </p>
+                            <div className={`${themeClasses.text.secondary} leading-relaxed`}>
+                                <EditableText 
+                                    value={personalInfo.about} 
+                                    path="personalInfo.about" 
+                                    multiline
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -94,10 +105,18 @@ const LandingPage: React.FC = () => {
                 <section className="py-16 bg-white dark:bg-gray-800 transition-colors duration-200">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-12">
-                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">My Work</h2>
+                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                                <EditableText 
+                                    value={pageContent.projects.title} 
+                                    path="pageContent.projects.title" 
+                                />
+                            </h2>
                             <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                                Overview of my project accomplishments and technical experience gained during my
-                                apprenticeship.
+                                <EditableText 
+                                    value={pageContent.projects.description} 
+                                    path="pageContent.projects.description" 
+                                    multiline
+                                />
                             </p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -106,7 +125,12 @@ const LandingPage: React.FC = () => {
                                 <div
                                     className="text-4xl font-bold text-purple-500 dark:text-purple-400 mb-2">{projects.length}</div>
                                 <div
-                                    className="text-gray-600 dark:text-gray-300 font-medium">{pageContent.about.stats.projectsLabel}</div>
+                                    className="text-gray-600 dark:text-gray-300 font-medium">
+                                    <EditableText 
+                                        value={pageContent.about.stats.projectsLabel} 
+                                        path="pageContent.about.stats.projectsLabel" 
+                                    />
+                                </div>
                                 <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Real-world applications</div>
                             </div>
                             <div

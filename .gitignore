@@ -28,3 +28,6 @@ yarn-error.log*
 
 # Test output
 junit.xml
+
+# Uploads
+/uploads

@@ -1,0 +1,233 @@
+{
+    "websiteTitle": "Portfolio Template",
+    "websiteIcon": "/assets/icon/YOUR_WEBSITE_ICON.ico",
+    "personalInfo": {
+        "name": "Justin Rosengart",
+        "image": "/assets/LandingPage/example-image.jpg",
+        "titleShort": "Azubi FIAE",
+        "titleLong": "Your Long Title or Description",
+        "email": "your.email@example.com",
+        "location": "City, Region, Country",
+        "tagline": "Your personal tagline.",
+        "description": "Short description about yourself.",
+        "about": "Write a longer introduction about your background, experience, and interests here.",
+        "topSkills": [
+            "Skill 1",
+            "Skill 2",
+            "Skill 3",
+            "Languages: English, German, etc."
+        ]
+    },
+    "skills": [
+        {
+            "title": "Skill Category 1",
+            "description": "Description of skill category 1.",
+            "icon": "Users"
+        },
+        {
+            "title": "Skill Category 2",
+            "description": "Description of skill category 2.",
+            "icon": "Clipboard"
+        }
+    ],
+    "educations": [],
+    "experiences": [],
+    "certifications": [],
+    "projects": [],
+    "pageContent": {
+        "about": {
+            "title": "About Me",
+            "stats": {
+                "projectsLabel": "Projects",
+                "experienceLabel": "Months of Experience",
+                "technologiesLabel": "Technologies Learned",
+                "certificationsLabel": "Certifications"
+            }
+        },
+        "projects": {
+            "title": "My Projects",
+            "description": "Here are some of the projects I've worked on during my apprenticeship at Deutsche Telekom.",
+            "viewToggle": {
+                "grid": "Grid",
+                "list": "List"
+            },
+            "buttons": {
+                "showMore": "Show All {count} Projects",
+                "showLess": "Show Less"
+            },
+            "emptyState": {
+                "message": "I'm currently working on building my portfolio."
+            }
+        },
+        "contact": {
+            "title": "Get in Touch",
+            "description": "I'm currently seeking new opportunities and would love to hear from you. Whether you have a project in mind or just want to connect, feel free to reach out.",
+            "sectionTitle": "Contact Information",
+            "formLabels": {
+                "name": "Your Name",
+                "email": "Your Email",
+                "message": "Your Message",
+                "submit": "Send Message"
+            },
+            "formPlaceholders": {
+                "name": "Enter your name",
+                "email": "Enter your email",
+                "message": "Enter your message"
+            },
+            "contactLabels": {
+                "email": "Email",
+                "linkedin": "LinkedIn",
+                "location": "Location"
+            }
+        },
+        "profile": {
+            "title": "Professional Profile",
+            "description": "Learn more about my educational background, skills, and professional journey in software development.",
+            "sections": {
+                "education": "Education",
+                "skills": "Skills & Expertise"
+            }
+        },
+        "gallery": {
+            "title": "Portfolio Gallery",
+            "description": "Explore my creative work across various design disciplines including tattoo art, graphic design, media projects, and vehicle design.",
+            "categories": {
+                "all": "All",
+                "tattoo": "Tattoo Art",
+                "graphics": "Graphic Design",
+                "media": "Media Design",
+                "vehicle": "Vehicle Design"
+            },
+            "viewModes": {
+                "grid": "Grid View",
+                "masonry": "Masonry View"
+            },
+            "buttons": {
+                "viewLarger": "View Larger",
+                "close": "Close",
+                "previous": "Previous",
+                "next": "Next"
+            }
+        }
+    },
+    "quickLinks": [
+        {
+            "name": "About",
+            "path": "/about"
+        },
+        {
+            "name": "Projects",
+            "path": "/projects"
+        },
+        {
+            "name": "Gallery",
+            "path": "/gallery"
+        },
+        {
+            "name": "Contact",
+            "path": "/contact"
+        },
+        {
+            "name": "Profile",
+            "path": "/profile"
+        }
+    ],
+    "uiLabels": {
+        "navigation": {
+            "home": "Home",
+            "projects": "Projects",
+            "gallery": "Gallery",
+            "contact": "Contact",
+            "profile": "Profile"
+        },
+        "buttons": {
+            "viewDetails": "View Details",
+            "showMore": "Show More",
+            "showLess": "Show Less",
+            "submit": "Submit",
+            "cancel": "Cancel",
+            "close": "Close",
+            "back": "Back"
+        },
+        "status": {
+            "loading": "Loading...",
+            "error": "An error occurred",
+            "success": "Success!",
+            "noResults": "No results found"
+        },
+        "accessibility": {
+            "darkMode": "Toggle dark mode",
+            "lightMode": "Toggle light mode",
+            "menu": "Menu",
+            "closeMenu": "Close menu"
+        }
+    },
+    "footerContent": {
+        "sections": {
+            "quickLinks": {
+                "title": "Quick Links"
+            },
+            "connect": {
+                "title": "Connect"
+            },
+            "legal": {
+                "privacyPolicy": "Privacy Policy",
+                "termsOfService": "Terms of Service"
+            }
+        },
+        "copyright": {
+            "text": "All rights reserved."
+        }
+    },
+    "formConfig": {
+        "contact": {
+            "fields": [
+                {
+                    "name": "name",
+                    "type": "text",
+                    "required": true,
+                    "placeholder": "Enter your name",
+                    "label": "Your Name"
+                },
+                {
+                    "name": "email",
+                    "type": "email",
+                    "required": true,
+                    "placeholder": "Enter your email",
+                    "label": "Your Email"
+                },
+                {
+                    "name": "message",
+                    "type": "textarea",
+                    "required": true,
+                    "placeholder": "Enter your message",
+                    "label": "Your Message"
+                }
+            ],
+            "submitButton": {
+                "text": "Send Message",
+                "loadingText": "Sending..."
+            }
+        }
+    },
+    "animationConfig": {
+        "transitions": {
+            "default": "transition-colors duration-200",
+            "fast": "transition-colors duration-100",
+            "slow": "transition-colors duration-300"
+        },
+        "delays": {
+            "short": 100,
+            "medium": 200,
+            "long": 500
+        }
+    },
+    "galleryImages": [],
+    "galleryCategories": [
+        {
+            "id": "example-category",
+            "name": "Example Category",
+            "description": "Description of the example category."
+        }
+    ]
+}
