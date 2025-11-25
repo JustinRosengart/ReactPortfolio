@@ -191,21 +191,19 @@ const ProjectDetailPage: React.FC = () => {
                         {/* Technologies Used */}
                         <div className="mb-8">
                             <h2 className={`text-2xl font-bold ${themeClasses.text.primary} mb-6`}>Technologies Used</h2>
-                            <div className="flex flex-wrap gap-3">
-                                <EditableList
+                            <EditableList
                                     path={`projects.${projectIndex}.technologies`}
                                     items={project.technologies}
                                     onAdd={() => "New Tech"}
-                                    itemClassName="inline-block"
+                                    containerClassName="flex flex-wrap gap-3 w-full"
                                     renderItem={(tech: string, index: number) => (
                                         <span
-                                            className={`px-4 py-2 ${themeClasses.bg.primaryLight} ${themeClasses.text.accent} rounded-full text-base font-medium transition-colors duration-200`}
+                                            className={`block px-4 py-2 ${themeClasses.bg.primaryLight} ${themeClasses.text.accent} rounded-full text-base font-medium transition-colors duration-200`}
                                         >
                                             <EditableText value={tech} path={`projects.${projectIndex}.technologies.${index}`} />
                                         </span>
                                     )}
                                 />
-                            </div>
                         </div>
 
                         {/* Action Buttons */}
@@ -289,10 +287,10 @@ const ProjectDetailPage: React.FC = () => {
                 {isBuilderMode ? (
                     <div className="mt-16 p-8 border-2 border-yellow-400 rounded-lg bg-yellow-50/10">
                         <h3 className="text-sm font-bold text-yellow-600 mb-2">Edit Markdown Content</h3>
-                        <EditableText 
-                            value={project.additionalInfo || ''} 
-                            path={`projects.${projectIndex}.additionalInfo`} 
-                            multiline 
+                        <EditableText
+                            value={project.additionalInfo || ''}
+                            path={`projects.${projectIndex}.additionalInfo`}
+                            multiline
                             className="min-h-[300px] font-mono text-sm w-full p-4 bg-white dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600"
                         />
                     </div>
