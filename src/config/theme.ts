@@ -1,6 +1,6 @@
 // Theme configuration
 // EINFACHE ANPASSUNG: Ändere hier die ACCENT_COLOR um das Farbschema zu wechseln
-const ACCENT_COLOR = 'teal'; // Mögliche Werte: 'blue', 'indigo', 'purple', 'green', 'red', 'orange', 'pink', 'cyan', 'teal'
+const ACCENT_COLOR = 'blue'; // Mögliche Werte: 'blue', 'indigo', 'purple', 'green', 'red', 'orange', 'pink', 'cyan', 'teal'
 
 // Theme-Definitionen für alle unterstützten Farben (für Tailwind CSS Purging)
 const THEME_DEFINITIONS = {
