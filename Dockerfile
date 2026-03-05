@@ -9,6 +9,14 @@ RUN npm ci
 
 # Quellcode kopieren und die Anwendung bauen
 COPY . .
+
+# Build-Argumente für Supabase aus der CI/CD-Pipeline übernehmen
+ARG REACT_APP_SUPABASE_URL
+ENV REACT_APP_SUPABASE_URL=$REACT_APP_SUPABASE_URL
+
+ARG REACT_APP_SUPABASE_ANON_KEY
+ENV REACT_APP_SUPABASE_ANON_KEY=$REACT_APP_SUPABASE_ANON_KEY
+
 RUN npm run build
 
 # Phase 2: Die gebaute Anwendung mit Nginx servieren

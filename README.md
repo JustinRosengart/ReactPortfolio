@@ -1,73 +1,114 @@
-# React Portfolio Template
+# React Portfolio Template with Supabase
 
-This project is a template for creating a personal portfolio website using React. It is designed to be easily customizable and ready for deployment with GitLab CI/CD.
+This project is a modern, customizable personal portfolio website built with React, TypeScript, and Tailwind CSS. It has been fully migrated to use **Supabase** as its backend for dynamic content management, replacing local static files. It is also ready for deployment via Docker and GitLab CI/CD.
 
 ## Features
-- Modular structure for personal information and projects
-- Easy configuration for website title and icon
-- Functional contact form with EmailJS integration
-- Automated testing, linting, and deployment via GitLab CI/CD
-- Responsive design with Tailwind CSS
-- Dark mode support
 
-## Getting Started
+-   **Dynamic Content via Supabase:** All text, projects, skills, and configuration data are loaded from a PostgreSQL database in Supabase. No more hardcoded data in React!
+-   **Image Storage:** Project and profile images can be stored and served via Supabase Storage buckets.
+-   **Tailwind CSS:** Fully styled with Tailwind for rapid UI customization.
+-   **Dark/Light Mode:** Built-in theme toggling context.
+-   **Contact Form:** Functional contact form using EmailJS.
+-   **Docker Ready:** Includes a multi-stage Dockerfile utilizing Nginx for serving the optimized build.
+-   **GitLab CI/CD:** Pre-configured pipeline for automated testing, building, and deployment.
 
-### 1. Install dependencies
-Run the following command in the project directory:
+---
 
+## 🚀 Setup & Local Development
+
+### 1. Supabase Preparation
+Before starting the application, you need to set up your backend:
+1. Create a new project in your [Supabase Dashboard](https://supabase.com).
+2. Go to the **SQL Editor** and run the contents of the `supabase.sql` file located in the root of this repository. This will create all necessary tables and RLS (Row Level Security) policies.
+3. Go to **Storage** and create a *public* bucket named exactly `portfolio-images`.
+
+### 2. Environment Variables
+Copy `.env.example` to a new file named `.env` in the root directory and fill in your credentials:
+
+```env
+# EmailJS (For Contact Form)
+REACT_APP_EMAILJS_SERVICE_ID=your_service_id_here
+REACT_APP_EMAILJS_TEMPLATE_ID=your_template_id_here
+REACT_APP_EMAILJS_PUBLIC_KEY=your_public_key_here
+
+# Supabase (Required for Content Fetching)
+REACT_APP_SUPABASE_URL=https://[YOUR_PROJECT_ID].supabase.co
+REACT_APP_SUPABASE_ANON_KEY=your_anon_key
+
+# Supabase Admin (ONLY needed locally for initial data seeding/migration)
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+### 3. Install Dependencies
 ```bash
 npm install
 ```
 
-### 2. Configure your portfolio
-Edit the files in `src/data/` to add your personal information and projects:
-- `personal.ts`: Add your name, bio, contact info, etc.
-- `projects.ts`: Add your projects with title, description, links, etc.
-- `website.ts`: Set the website title and icon path.
+### 4. Initializing Data (Seeding)
+Because the application now relies entirely on Supabase, a fresh database will result in a website stuck in a loading state. We provide scripts to migrate existing data and images to your Supabase project.
 
-All example data is provided in English. Replace the example entries with your own information.
+First, run the seed script to populate the database with structural data:
+```bash
+npm run seed-db
+```
+*(Note: This script requires the `SUPABASE_SERVICE_ROLE_KEY` to bypass RLS and insert the data).*
 
-### 3. Set up contact form (optional)
-To enable the functional contact form, follow the setup guide:
-📧 **[EmailJS Setup Guide](./docs/EMAILJS_SETUP.md)**
+If you have local images in your `public/` directory, you can automatically upload them to your Supabase bucket and update the database URLs:
+```bash
+npm run migrate-images
+```
 
-### 4. Run locally
-Start the development server:
-
+### 5. Start Development Server
 ```bash
 npm start
 ```
+The app will be running at `http://localhost:3000`.
 
-Open [http://localhost:3000](http://localhost:3000) to view your portfolio.
+---
 
-## GitLab CI/CD Setup
+## 🐳 Docker Setup
 
-This template includes a `.gitlab-ci.yml` for automated testing, linting, building, and deployment. To enable deployment, you must set the following CI/CD variables in your GitLab project settings:
+This project uses a multi-stage Docker build. First, it builds the React app using Node.js, and then it serves the static files using Nginx.
 
-- `DEPLOY_PATH`: The absolute path on your server where the portfolio should be deployed (e.g. `/var/www/html/portfolio`).
-- `SERVER_HOST`: The hostname or IP address of your deployment server.
-- `SERVER_USER`: The SSH user for deployment.
-- `SSH_PRIVATE_KEY`: The private SSH key (as a variable) for authentication. **Never commit this key to the repository!**
+To build the image locally, you must pass the Supabase variables as build arguments so they are injected into the optimized React build:
 
-You can set these variables in GitLab under **Settings > CI/CD > Variables**.
+```bash
+docker build \
+  --build-arg REACT_APP_SUPABASE_URL="your-supabase-url" \
+  --build-arg REACT_APP_SUPABASE_ANON_KEY="your-anon-key" \
+  -t react-portfolio .
+```
 
-## Customization
+Run the container:
+```bash
+docker run -p 8080:80 react-portfolio
+```
 
-- **Website Title & Icon**: Set these in `src/data/website.ts`. The title and icon will be injected into the HTML automatically.
-- **Theme**: Adjust colors and styles in `src/config/theme.ts` and with Tailwind CSS.
+---
 
-## Deployment
+## 🔄 GitLab CI/CD Setup
 
-Once the CI/CD variables are set, every push to the repository will trigger the pipeline. On successful build, the portfolio will be deployed to your server via SSH.
+This repository contains a `.gitlab-ci.yml` pipeline that automatically builds the Docker image and deploys it using `docker-compose`.
+
+To enable the pipeline, you **must** configure the following variables in your GitLab project under **Settings > CI/CD > Variables**:
+
+### Required Deployment Variables:
+-   `SERVER_HOST`: The IP address or domain of your target server.
+-   `SERVER_USER`: The SSH user (e.g., `root` or `ubuntu`).
+-   `SSH_PRIVATE_KEY`: The private SSH key used to connect to your server.
+-   `DEPLOY_PATH`: The directory on the server where the `docker-compose.yml` is located (e.g., `/opt/portfolio`).
+
+### Required Application Variables (Supabase):
+The pipeline passes these secrets securely into the Docker build process:
+-   `REACT_APP_SUPABASE_URL`: Your Supabase Project URL.
+-   `REACT_APP_SUPABASE_ANON_KEY`: Your Supabase Anon Key.
+
+Once these are set, pushing to the `main` branch will trigger a build, and you can trigger the deployment job manually.
 
 ## Documentation
 - 📧 [EmailJS Contact Form Setup](./docs/EMAILJS_SETUP.md)
 
-## Learn More
-- [React documentation](https://reactjs.org/)
-- [Tailwind CSS documentation](https://tailwindcss.com/)
-- [GitLab CI/CD documentation](https://docs.gitlab.com/ee/ci/)
-
----
-
-**Note:** This template is designed for easy adaptation. Replace all example data and adjust configuration files as needed for your own portfolio.
+## Useful Links
+- [React Documentation](https://reactjs.org/docs/getting-started.html)
+- [Tailwind CSS Documentation](https://tailwindcss.com/)
+- [Supabase Documentation](https://supabase.com/docs)

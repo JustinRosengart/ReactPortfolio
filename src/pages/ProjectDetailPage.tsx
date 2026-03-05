@@ -3,9 +3,7 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {ArrowLeft, CheckCircle, ExternalLink, Github} from 'lucide-react';
 import { themeClasses } from '../config/theme';
 import ProjectGallery from '../components/ProjectGallery';
-import { useBuilder } from '../context/BuilderContext';
-import { EditableText } from '../components/Builder/EditableText';
-import { EditableList } from '../components/Builder/EditableList';
+import { useData } from '../context/DataContext';
 
 // React Markdown with custom components for styling
 import ReactMarkdown from 'react-markdown';
@@ -125,19 +123,19 @@ const MarkdownRenderer: React.FC<{ content: string }> = ({content}) => {
 const ProjectDetailPage: React.FC = () => {
     const {id} = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { content, isBuilderMode } = useBuilder();
+    const { projects } = useData();
 
-    const projectIndex = content.projects.findIndex((p: any) => p.url === id);
-    const project = content.projects[projectIndex];
+    const projectIndex = (projects || []).findIndex((p: any) => p.url === id);
+    const project = (projects || [])[projectIndex];
 
     useEffect(() => {
-        if (projectIndex === -1) {
+        if (projects && projects.length > 0 && projectIndex === -1) {
             navigate('/projects', {replace: true});
         }
-    }, [projectIndex, navigate]);
+    }, [projectIndex, navigate, projects]);
 
     if (!project) {
-        return null;
+        return <div className="min-h-screen flex items-center justify-center">Loading project...</div>;
     }
 
     const handleBack = () => {
@@ -160,50 +158,42 @@ const ProjectDetailPage: React.FC = () => {
                     {/* Project Content */}
                     <div>
                         <h1 className={`text-4xl font-bold ${themeClasses.text.primary} mb-6`}>
-                            <EditableText value={project.title} path={`projects.${projectIndex}.title`} />
+                            {project.title}
                         </h1>
 
                         <p className={`text-lg ${themeClasses.text.secondary} mb-8 leading-relaxed`}>
-                            <EditableText value={project.description} path={`projects.${projectIndex}.description`} multiline />
+                            {project.description}
                         </p>
 
                         {/* Key Features */}
                         <div className="mb-8">
                             <h2 className={`text-2xl font-bold ${themeClasses.text.primary} mb-6`}>Key Features</h2>
                             <div className="space-y-4">
-                                <EditableList
-                                    path={`projects.${projectIndex}.features`}
-                                    items={project.features}
-                                    onAdd={() => "New Feature"}
-                                    renderItem={(feature: string, index: number) => (
-                                        <div className="flex items-center space-x-3">
-                                            <CheckCircle
-                                                className={`w-6 h-6 ${themeClasses.text.accent} flex-shrink-0`}/>
-                                            <span className={`text-lg ${themeClasses.text.secondary}`}>
-                                                <EditableText value={feature} path={`projects.${projectIndex}.features.${index}`} />
-                                            </span>
-                                        </div>
-                                    )}
-                                />
+                                {(project.features || []).map((feature: string, index: number) => (
+                                    <div key={index} className="flex items-center space-x-3">
+                                        <CheckCircle
+                                            className={`w-6 h-6 ${themeClasses.text.accent} flex-shrink-0`}/>
+                                        <span className={`text-lg ${themeClasses.text.secondary}`}>
+                                            {feature}
+                                        </span>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
                         {/* Technologies Used */}
                         <div className="mb-8">
                             <h2 className={`text-2xl font-bold ${themeClasses.text.primary} mb-6`}>Technologies Used</h2>
-                            <EditableList
-                                    path={`projects.${projectIndex}.technologies`}
-                                    items={project.technologies}
-                                    onAdd={() => "New Tech"}
-                                    containerClassName="flex flex-wrap gap-3 w-full"
-                                    renderItem={(tech: string, index: number) => (
-                                        <span
-                                            className={`block px-4 py-2 ${themeClasses.bg.primaryLight} ${themeClasses.text.accent} rounded-full text-base font-medium transition-colors duration-200`}
-                                        >
-                                            <EditableText value={tech} path={`projects.${projectIndex}.technologies.${index}`} />
-                                        </span>
-                                    )}
-                                />
+                            <div className="flex flex-wrap gap-3 w-full">
+                                {(project.technologies || []).map((tech: string, index: number) => (
+                                    <span
+                                        key={index}
+                                        className={`block px-4 py-2 ${themeClasses.bg.primaryLight} ${themeClasses.text.accent} rounded-full text-base font-medium transition-colors duration-200`}
+                                    >
+                                        {tech}
+                                    </span>
+                                ))}
+                            </div>
                         </div>
 
                         {/* Action Buttons */}
@@ -249,12 +239,12 @@ const ProjectDetailPage: React.FC = () => {
                                 <div className="flex justify-between items-center">
                                     <span className={`${themeClasses.text.secondary}`}>Features</span>
                                     <span
-                                        className={`font-semibold ${themeClasses.text.primary}`}>{project.features.length}</span>
+                                        className={`font-semibold ${themeClasses.text.primary}`}>{project.features?.length || 0}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className={`${themeClasses.text.secondary}`}>Technologies</span>
                                     <span
-                                        className={`font-semibold ${themeClasses.text.primary}`}>{project.technologies.length}</span>
+                                        className={`font-semibold ${themeClasses.text.primary}`}>{project.technologies?.length || 0}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className={`${themeClasses.text.secondary}`}>Status</span>
@@ -269,13 +259,13 @@ const ProjectDetailPage: React.FC = () => {
                                                         : themeClasses.status.success.bg + ' ' + themeClasses.status.success.text
                                         }`}
                                     >
-                                        <EditableText value={project.status} path={`projects.${projectIndex}.status`} />
+                                        {project.status}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className={`${themeClasses.text.secondary}`}>Type</span>
                                     <span className={`font-semibold ${themeClasses.text.primary}`}>
-                                        <EditableText value={project.type} path={`projects.${projectIndex}.type`} />
+                                        {project.type}
                                     </span>
                                 </div>
                             </div>
@@ -284,23 +274,10 @@ const ProjectDetailPage: React.FC = () => {
                 </div>
 
                 {/* Additional Project Details - Now from Markdown */}
-                {isBuilderMode ? (
-                    <div className="mt-16 p-8 border-2 border-yellow-400 rounded-lg bg-yellow-50/10">
-                        <h3 className="text-sm font-bold text-yellow-600 mb-2">Edit Markdown Content</h3>
-                        <EditableText
-                            value={project.additionalInfo || ''}
-                            path={`projects.${projectIndex}.additionalInfo`}
-                            multiline
-                            className="min-h-[300px] font-mono text-sm w-full p-4 bg-white dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600"
-                        />
+                {project.additionalInfo && (
+                    <div className={`mt-16 ${themeClasses.card.base} p-8`}>
+                        <MarkdownRenderer content={project.additionalInfo}/>
                     </div>
-                ) : (
-                    project.additionalInfo && (
-                        <div
-                            className={`mt-16 ${themeClasses.card.base} p-8`}>
-                            <MarkdownRenderer content={project.additionalInfo}/>
-                        </div>
-                    )
                 )}
             </div>
         </div>
@@ -308,4 +285,3 @@ const ProjectDetailPage: React.FC = () => {
 };
 
 export default ProjectDetailPage;
-

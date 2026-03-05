@@ -1,13 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Github, Linkedin, Twitter, Instagram } from 'lucide-react';
-import { footerContent, quickLinks } from '../data/website';
-import { personalInfo, contactInfo } from '../data/personal';
 import { themeClasses } from '../config/theme';
-import { EditableText } from './Builder/EditableText';
+import { useData } from '../context/DataContext';
 
 const Footer: React.FC = () => {
     const currentYear = new Date().getFullYear();
+    const { personalInfo, footerContent, quickLinks, contactInfo } = useData();
 
     const socialIcons = {
         Github,
@@ -23,20 +22,20 @@ const Footer: React.FC = () => {
                     {/* Brand */}
                     <div className="col-span-1 md:col-span-2">
                         <h3 className={`text-xl font-bold ${themeClasses.text.primary} mb-4`}>
-                            <EditableText value={personalInfo.name} path="personalInfo.name" />
+                            {personalInfo.name}
                         </h3>
                         <p className={`${themeClasses.text.secondary} mb-6 max-w-sm`}>
-                            <EditableText value={personalInfo.tagline} path="personalInfo.tagline" />
+                            {personalInfo.tagline}
                         </p>
                     </div>
 
                     {/* Quick Links */}
                     <div>
                         <h4 className={`font-semibold ${themeClasses.text.primary} mb-4`}>
-                            <EditableText value={footerContent.sections.quickLinks.title} path="footerContent.sections.quickLinks.title" />
+                            {footerContent.sections.quickLinks.title}
                         </h4>
                         <ul className="space-y-2">
-                            {quickLinks.map((link: any) => (
+                            {(quickLinks || []).map((link: any) => (
                                 <li key={link.name}>
                                     <a
                                         href={link.path}
@@ -52,11 +51,12 @@ const Footer: React.FC = () => {
                     {/* Connect */}
                     <div>
                         <h4 className={`font-semibold ${themeClasses.text.primary} mb-4`}>
-                            <EditableText value={footerContent.sections.connect.title} path="footerContent.sections.connect.title" />
+                            {footerContent.sections.connect.title}
                         </h4>
                         <div className="flex space-x-4">
-                            {contactInfo.socialLinks.map((social: any) => {
+                            {(contactInfo.socialLinks || []).map((social: any) => {
                                 const Icon = socialIcons[social.icon as keyof typeof socialIcons];
+                                if (!Icon) return null;
                                 return (
                                     <a
                                         key={social.name}

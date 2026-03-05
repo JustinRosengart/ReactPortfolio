@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { Mail, MapPin, Linkedin, CheckCircle, XCircle } from 'lucide-react';
-import { personalInfo, contactInfo } from '../data/personal';
-import { pageContent } from '../data/website';
 import { themeClasses } from '../config/theme';
-import { EditableText } from '../components/Builder/EditableText';
+import { useData } from '../context/DataContext';
 
 const ContactPage: React.FC = () => {
+    const { personalInfo, pageContent, contactInfo } = useData();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -46,10 +45,10 @@ const ContactPage: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4 py-12">
             <div className="text-center mb-12">
                 <h1 className={`text-4xl font-bold ${themeClasses.text.primary} mb-4`}>
-                    <EditableText value={pageContent.contact.title} path="pageContent.contact.title" />
+                    {pageContent.contact.title}
                 </h1>
                 <p className={`text-xl ${themeClasses.text.secondary} max-w-2xl mx-auto`}>
-                    <EditableText value={pageContent.contact.description} path="pageContent.contact.description" />
+                    {pageContent.contact.description}
                 </p>
             </div>
 
@@ -57,7 +56,7 @@ const ContactPage: React.FC = () => {
                 {/* Contact Info */}
                 <div>
                     <h2 className={`text-2xl font-bold ${themeClasses.text.primary} mb-8`}>
-                        <EditableText value={pageContent.contact.sectionTitle} path="pageContent.contact.sectionTitle" />
+                        {pageContent.contact.sectionTitle}
                     </h2>
                     
                     <div className="space-y-8">
@@ -81,7 +80,7 @@ const ContactPage: React.FC = () => {
                             </div>
                         </div>
 
-                        {contactInfo.socialLinks.find(link => link.name === 'LinkedIn') && (
+                        {(contactInfo.socialLinks || []).find((link: any) => link.name === 'LinkedIn') && (
                             <div className="flex items-center space-x-4">
                                 <div
                                     className={`w-12 h-12 ${themeClasses.bg.primaryLight} rounded-full flex items-center justify-center transition-colors duration-200`}>
@@ -90,12 +89,12 @@ const ContactPage: React.FC = () => {
                                 <div>
                                     <p className={`text-sm ${themeClasses.text.accent}`}>{pageContent.contact.contactLabels.linkedin}</p>
                                     <a
-                                        href={contactInfo.socialLinks.find(link => link.name === 'LinkedIn')?.href || '#'}
+                                        href={contactInfo.socialLinks.find((link: any) => link.name === 'LinkedIn')?.href || '#'}
                                         className={`font-medium ${themeClasses.text.primary}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >
-                                        {contactInfo.socialLinks.find(link => link.name === 'LinkedIn')?.href?.replace('https://', '') || 'LinkedIn Profile'}
+                                        {contactInfo.socialLinks.find((link: any) => link.name === 'LinkedIn')?.href?.replace('https://', '') || 'LinkedIn Profile'}
                                     </a>
                                 </div>
                             </div>

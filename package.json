@@ -5,6 +5,7 @@
   "proxy": "http://localhost:3001",
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
+    "@supabase/supabase-js": "^2.98.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/react": "^16.3.0",
@@ -31,7 +32,9 @@
     "eject": "react-scripts eject",
     "optimize-images": "node scripts/optimizeImages.js",
     "generate-manifests": "node scripts/generateImageManifests.js",
-    "dev:builder": "concurrently \"set REACT_APP_ENABLE_BUILDER=true&& npm run start\" \"node server/index.js\""
+    "dev:builder": "concurrently \"set REACT_APP_ENABLE_BUILDER=true&& npm run start\" \"node server/index.js\"",
+    "seed-db": "node scripts/seedSupabase.js",
+    "migrate-images": "node scripts/migrateImages.js"
   },
   "eslintConfig": {
     "extends": [
@@ -75,8 +78,10 @@
     "body-parser": "^2.2.0",
     "concurrently": "^9.2.1",
     "cors": "^2.8.5",
+    "dotenv": "^17.3.1",
     "express": "^5.1.0",
     "jest-junit": "^16.0.0",
+    "mime-types": "^3.0.2",
     "sharp": "^0.34.3"
   }
 }
