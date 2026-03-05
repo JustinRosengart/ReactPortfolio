@@ -1,4 +1,3 @@
-// Example template for project data
 import {Project} from '../types';
 import websiteData from './website.json';
 
