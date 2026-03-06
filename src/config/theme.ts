@@ -1,6 +1,6 @@
 // Theme configuration
 // EINFACHE ANPASSUNG: Ändere hier die ACCENT_COLOR um das Farbschema zu wechseln
-const ACCENT_COLOR = 'teal'; // Mögliche Werte: 'blue', 'indigo', 'purple', 'green', 'red', 'orange', 'pink', 'cyan', 'teal'
+const ACCENT_COLOR = 'blue'; // Mögliche Werte: 'blue', 'indigo', 'purple', 'green', 'red', 'orange', 'pink', 'cyan', 'teal'
 
 // Theme-Definitionen für alle unterstützten Farben (für Tailwind CSS Purging)
 const THEME_DEFINITIONS = {
@@ -231,6 +231,28 @@ export const themeClasses = createThemeClasses(ACCENT_COLOR);
 
 // Verfügbare Akzentfarben für Tailwind CSS
 export const AVAILABLE_COLORS = Object.keys(THEME_DEFINITIONS) as (keyof typeof THEME_DEFINITIONS)[];
+
+// Function to dynamically update theme classes at runtime
+export const updateThemeClasses = (accentColor: keyof typeof THEME_DEFINITIONS) => {
+    if (!THEME_DEFINITIONS[accentColor]) return false;
+    
+    const newClasses = createThemeClasses(accentColor);
+    
+    // Deep merge to update references used across the app
+    const updateObject = (target: any, source: any) => {
+        for (const key in source) {
+            if (typeof source[key] === 'object' && source[key] !== null) {
+                if (!target[key]) target[key] = {};
+                updateObject(target[key], source[key]);
+            } else {
+                target[key] = source[key];
+            }
+        }
+    };
+    
+    updateObject(themeClasses, newClasses);
+    return true;
+};
 
 // Utility function to get theme classes with type safety
 export const getThemeClass = <T extends keyof typeof themeClasses>(

@@ -27,6 +27,13 @@ async function seed() {
   const rawData = fs.readFileSync(dataPath, 'utf-8');
   const data = JSON.parse(rawData);
 
+  console.log("Clearing existing data from tables...");
+  const tablesToClear = ['personal_info', 'skills', 'projects', 'website_config'];
+  for (const table of tablesToClear) {
+      const { error } = await supabase.from(table).delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      if (error) console.error(`Error clearing table ${table}:`, error.message);
+  }
+
   console.log("Uploading personal info...");
   const { error: piError } = await supabase.from('personal_info').insert({
     name: data.personalInfo.name,
@@ -82,12 +89,16 @@ async function seed() {
   }
 
   console.log("Uploading website configuration...");
-  const configKeys = ['websiteTitle', 'websiteIcon', 'pageContent', 'quickLinks', 'uiLabels', 'footerContent', 'formConfig', 'animationConfig'];
+  const configKeys = ['websiteTitle', 'websiteIcon', 'pageContent', 'quickLinks', 'uiLabels', 'footerContent', 'formConfig', 'animationConfig', 'accentColor'];
   for (const key of configKeys) {
-      if (data[key]) {
+      let val = data[key];
+      if (key === 'accentColor' && !val) {
+          val = 'teal'; // default accent color
+      }
+      if (val) {
           const { error } = await supabase.from('website_config').upsert({
               config_key: key,
-              config_value: data[key]
+              config_value: val
           }, { onConflict: 'config_key' });
           if (error) console.error(`Error inserting config ${key}:`, error.message);
       }

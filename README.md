@@ -8,6 +8,7 @@ This project is a modern, customizable personal portfolio website built with Rea
 -   **Image Storage:** Project and profile images can be stored and served via Supabase Storage buckets.
 -   **Tailwind CSS:** Fully styled with Tailwind for rapid UI customization.
 -   **Dark/Light Mode:** Built-in theme toggling context.
+-   **Dynamic Theme Color:** Easily configure your website's main accent color dynamically via the Supabase database.
 -   **Contact Form:** Functional contact form using EmailJS.
 -   **Docker Ready:** Includes a multi-stage Dockerfile utilizing Nginx for serving the optimized build.
 -   **GitLab CI/CD:** Pre-configured pipeline for automated testing, building, and deployment.
@@ -63,6 +64,17 @@ npm run migrate-images
 npm start
 ```
 The app will be running at `http://localhost:3000`.
+
+---
+
+## 🎨 Customizing the Theme Color
+
+You can dynamically change the primary accent color of your portfolio without touching the code. 
+1. Open your Supabase Dashboard and navigate to the **Table Editor**.
+2. Open the `website_config` table.
+3. Look for the row where `config_key` is `accentColor` (if it doesn't exist, insert a new row).
+4. Set the `config_value` to one of the supported Tailwind color strings: `"blue"`, `"indigo"`, `"purple"`, `"green"`, `"red"`, `"orange"`, `"pink"`, `"cyan"`, or `"teal"`.
+5. Refresh your website, and the new color will automatically apply to buttons, links, and highlights!
 
 ---
 

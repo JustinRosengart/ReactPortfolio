@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../config/supabaseClient';
 import { PersonalInfo, Project, SkillCategory, LegalContent } from '../types';
+import { updateThemeClasses } from '../config/theme';
 
 interface DataContextType {
   personalInfo: PersonalInfo;
@@ -127,6 +128,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 if (item.config_key === 'quickLinks') setQuickLinks(item.config_value);
                 if (item.config_key === 'websiteTitle') setWebsiteTitle(item.config_value);
                 if (item.config_key === 'websiteIcon') setWebsiteIcon(item.config_value);
+                if (item.config_key === 'accentColor') {
+                    // Update theme color globally
+                    updateThemeClasses(item.config_value);
+                }
             });
         }
 
