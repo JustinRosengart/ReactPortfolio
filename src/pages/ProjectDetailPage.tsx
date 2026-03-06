@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
+import {useNavigate, useParams, Link} from 'react-router-dom';
 import {ArrowLeft, CheckCircle, ExternalLink, Github} from 'lucide-react';
 import { themeClasses } from '../config/theme';
 import ProjectGallery from '../components/ProjectGallery';
@@ -92,16 +92,29 @@ const MarkdownRenderer: React.FC<{ content: string }> = ({content}) => {
                         </li>
                     ),
                     // Links
-                    a: ({href, children}) => (
-                        <a
-                            href={href}
-                            className={`${themeClasses.text.accent} ${themeClasses.text.accentHover} underline transition-colors`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            {children}
-                        </a>
-                    ),
+                    a: ({href, children}) => {
+                        const isInternal = href?.startsWith('/');
+                        if (isInternal) {
+                            return (
+                                <Link
+                                    to={href}
+                                    className={`${themeClasses.text.accent} ${themeClasses.text.accentHover} underline transition-colors`}
+                                >
+                                    {children}
+                                </Link>
+                            );
+                        }
+                        return (
+                            <a
+                                href={href}
+                                className={`${themeClasses.text.accent} ${themeClasses.text.accentHover} underline transition-colors`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {children}
+                            </a>
+                        );
+                    },
                     // Horizontal rule
                     hr: () => (
                         <hr className={`${themeClasses.border.primaryLight} my-6`}/>

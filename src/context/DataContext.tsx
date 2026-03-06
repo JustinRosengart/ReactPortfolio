@@ -30,6 +30,9 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 const emptyLegalContent: LegalContent = { lastUpdated: '', sections: [] };
 
+const CACHE_KEY = 'portfolio_data_cache';
+const CACHE_EXPIRY_HOURS = 24;
+
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({} as PersonalInfo);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -57,13 +60,57 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     async function fetchData() {
       try {
         setLoading(true);
+
+        // Check cache first
+        const cachedDataStr = sessionStorage.getItem(CACHE_KEY);
+        if (cachedDataStr) {
+            const cachedData = JSON.parse(cachedDataStr);
+            const now = new Date().getTime();
+            if (now < cachedData.expiry) {
+                // Load from cache
+                setPersonalInfo(cachedData.data.personalInfo);
+                setProjects(cachedData.data.projects);
+                setSkills(cachedData.data.skills);
+                setExperiences(cachedData.data.experiences);
+                setEducations(cachedData.data.educations);
+                setCertifications(cachedData.data.certifications);
+                setGalleryCategories(cachedData.data.galleryCategories);
+                setGalleryImages(cachedData.data.galleryImages);
+                setPrivacyPolicy(cachedData.data.privacyPolicy);
+                setTermsOfService(cachedData.data.termsOfService);
+                setImprint(cachedData.data.imprint);
+                setPageContent(cachedData.data.pageContent);
+                setFooterContent(cachedData.data.footerContent);
+                setQuickLinks(cachedData.data.quickLinks);
+                setContactInfo(cachedData.data.contactInfo);
+                setWebsiteTitle(cachedData.data.websiteTitle);
+                setWebsiteIcon(cachedData.data.websiteIcon);
+                
+                if (cachedData.data.accentColor) {
+                    updateThemeClasses(cachedData.data.accentColor);
+                }
+                
+                setLoading(false);
+                return; // Exit early
+            } else {
+                // Cache expired, remove it
+                sessionStorage.removeItem(CACHE_KEY);
+            }
+        }
         
+        let fetchedData: any = {
+            privacyPolicy: emptyLegalContent,
+            termsOfService: emptyLegalContent,
+            imprint: emptyLegalContent,
+            contactInfo: { email: '', location: '', socialLinks: [] }
+        };
+
         // Fetch personal info
         const { data: piData, error: piError } = await supabase.from('personal_info').select('*').limit(1).single();
         if (piError && piError.code !== 'PGRST116') console.error('Personal info fetch error:', piError);
 
         if (piData) {
-          setPersonalInfo({
+          fetchedData.personalInfo = {
             name: piData.name,
             image: piData.image,
             titleShort: piData.title_short,
@@ -74,41 +121,45 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             description: piData.description,
             about: piData.about,
             topSkills: piData.top_skills || []
-          });
+          };
+          setPersonalInfo(fetchedData.personalInfo);
         }
 
         // Fetch contact info (social links)
         const { data: ciData, error: ciError } = await supabase.from('contact_info').select('*').limit(1).single();
         if (ciData) {
-            setContactInfo({
+            fetchedData.contactInfo = {
                 email: ciData.email || piData?.email,
                 location: ciData.location || piData?.location,
                 socialLinks: ciData.social_links || []
-            });
+            };
+            setContactInfo(fetchedData.contactInfo);
         } else if (piData) {
-            setContactInfo({
+            fetchedData.contactInfo = {
                 email: piData.email,
                 location: piData.location,
                 socialLinks: []
-            });
+            };
+            setContactInfo(fetchedData.contactInfo);
         }
 
         // Fetch skills
         const { data: skillsData, error: skillsError } = await supabase.from('skills').select('*').order('sort_order', { ascending: true });
         if (skillsError) console.error('Skills fetch error:', skillsError);
         if (skillsData && skillsData.length > 0) {
-          setSkills(skillsData.map(s => ({
+          fetchedData.skills = skillsData.map(s => ({
             title: s.title,
             description: s.description,
             icon: s.icon
-          })));
+          }));
+          setSkills(fetchedData.skills);
         }
 
         // Fetch projects
         const { data: projectsData, error: projectsError } = await supabase.from('projects').select('*').order('sort_order', { ascending: true });
         if (projectsError) console.error('Projects fetch error:', projectsError);
         if (projectsData && projectsData.length > 0) {
-          setProjects(projectsData.map(p => ({
+          fetchedData.projects = projectsData.map(p => ({
             title: p.title,
             description: p.description,
             url: p.url,
@@ -123,14 +174,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             type: p.type,
             features: p.features || [],
             technologies: p.technologies || []
-          })));
+          }));
+          setProjects(fetchedData.projects);
         }
 
         // Fetch experiences
         const { data: expData, error: expError } = await supabase.from('experiences').select('*').order('sort_order', { ascending: true });
         if (expError) console.error('Experiences fetch error:', expError);
         if (expData && expData.length > 0) {
-          setExperiences(expData.map(e => ({
+          fetchedData.experiences = expData.map(e => ({
             id: e.id,
             title: e.title,
             company: e.company,
@@ -141,14 +193,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             duration: e.duration,
             description: e.description,
             skills: e.skills || []
-          })));
+          }));
+          setExperiences(fetchedData.experiences);
         }
 
         // Fetch educations
         const { data: eduData, error: eduError } = await supabase.from('educations').select('*').order('sort_order', { ascending: true });
         if (eduError) console.error('Educations fetch error:', eduError);
         if (eduData && eduData.length > 0) {
-          setEducations(eduData.map(e => ({
+          fetchedData.educations = eduData.map(e => ({
             id: e.id,
             institution: e.institution,
             degree: e.degree,
@@ -158,14 +211,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             grade: e.grade,
             description: e.description,
             skills: e.skills || []
-          })));
+          }));
+          setEducations(fetchedData.educations);
         }
 
         // Fetch certifications
         const { data: certData, error: certError } = await supabase.from('certifications').select('*').order('sort_order', { ascending: true });
         if (certError) console.error('Certifications fetch error:', certError);
         if (certData && certData.length > 0) {
-          setCertifications(certData.map(c => ({
+          fetchedData.certifications = certData.map(c => ({
             id: c.id,
             name: c.name,
             issuer: c.issuer,
@@ -174,7 +228,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             credentialId: c.credential_id,
             credentialUrl: c.credential_url,
             description: c.description
-          })));
+          }));
+          setCertifications(fetchedData.certifications);
         }
 
         // Fetch gallery categories and images
@@ -197,14 +252,16 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
              type: gi.type as any,
              videoPath: gi.video_path
           }));
+          fetchedData.galleryImages = formattedImages;
           setGalleryImages(formattedImages);
 
-          setGalleryCategories(gcData.map(gc => ({
+          fetchedData.galleryCategories = gcData.map(gc => ({
              id: gc.id,
              name: gc.name,
              description: gc.description,
              images: formattedImages.filter(img => img.category === gc.id)
-          })));
+          }));
+          setGalleryCategories(fetchedData.galleryCategories);
         }
 
         // Fetch all website config
@@ -212,20 +269,27 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (configError) console.error('Config fetch error:', configError);
         if (configData) {
             configData.forEach(item => {
-                if (item.config_key === 'privacyPolicyContent') setPrivacyPolicy(item.config_value);
-                if (item.config_key === 'termsOfServiceContent') setTermsOfService(item.config_value);
-                if (item.config_key === 'imprintContent') setImprint(item.config_value);
-                if (item.config_key === 'pageContent') setPageContent(item.config_value);
-                if (item.config_key === 'footerContent') setFooterContent(item.config_value);
-                if (item.config_key === 'quickLinks') setQuickLinks(item.config_value);
-                if (item.config_key === 'websiteTitle') setWebsiteTitle(item.config_value);
-                if (item.config_key === 'websiteIcon') setWebsiteIcon(item.config_value);
+                if (item.config_key === 'privacyPolicyContent') { fetchedData.privacyPolicy = item.config_value; setPrivacyPolicy(item.config_value); }
+                if (item.config_key === 'termsOfServiceContent') { fetchedData.termsOfService = item.config_value; setTermsOfService(item.config_value); }
+                if (item.config_key === 'imprintContent') { fetchedData.imprint = item.config_value; setImprint(item.config_value); }
+                if (item.config_key === 'pageContent') { fetchedData.pageContent = item.config_value; setPageContent(item.config_value); }
+                if (item.config_key === 'footerContent') { fetchedData.footerContent = item.config_value; setFooterContent(item.config_value); }
+                if (item.config_key === 'quickLinks') { fetchedData.quickLinks = item.config_value; setQuickLinks(item.config_value); }
+                if (item.config_key === 'websiteTitle') { fetchedData.websiteTitle = item.config_value; setWebsiteTitle(item.config_value); }
+                if (item.config_key === 'websiteIcon') { fetchedData.websiteIcon = item.config_value; setWebsiteIcon(item.config_value); }
                 if (item.config_key === 'accentColor') {
+                    fetchedData.accentColor = item.config_value;
                     // Update theme color globally
                     updateThemeClasses(item.config_value);
                 }
             });
         }
+
+        // Save to cache
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+            data: fetchedData,
+            expiry: new Date().getTime() + (CACHE_EXPIRY_HOURS * 60 * 60 * 1000)
+        }));
 
       } catch (err: any) {
         console.error('Error fetching from Supabase:', err);

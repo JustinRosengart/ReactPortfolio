@@ -30,12 +30,12 @@ const Footer: React.FC = () => {
                         <ul className="space-y-2">
                             {(quickLinks || []).map((link: any) => (
                                 <li key={link.name}>
-                                    <a
-                                        href={link.path}
+                                    <Link
+                                        to={link.path}
                                         className={`${themeClasses.text.secondary} ${themeClasses.text.accentHover} transition-colors`}
                                     >
                                         {link.name}
-                                    </a>
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
