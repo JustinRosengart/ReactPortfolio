@@ -1,12 +1,17 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../config/supabaseClient';
-import { PersonalInfo, Project, SkillCategory, LegalContent } from '../types';
+import { PersonalInfo, Project, SkillCategory, LegalContent, Experience, Education, Certification, GalleryCategory, GalleryImage } from '../types';
 import { updateThemeClasses } from '../config/theme';
 
 interface DataContextType {
   personalInfo: PersonalInfo;
   projects: Project[];
   skills: SkillCategory[];
+  experiences: Experience[];
+  educations: Education[];
+  certifications: Certification[];
+  galleryCategories: GalleryCategory[];
+  galleryImages: GalleryImage[];
   privacyPolicy: LegalContent;
   termsOfService: LegalContent;
   imprint: LegalContent;
@@ -28,6 +33,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({} as PersonalInfo);
   const [projects, setProjects] = useState<Project[]>([]);
   const [skills, setSkills] = useState<SkillCategory[]>([]);
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [educations, setEducations] = useState<Education[]>([]);
+  const [certifications, setCertifications] = useState<Certification[]>([]);
+  const [galleryCategories, setGalleryCategories] = useState<GalleryCategory[]>([]);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [privacyPolicy, setPrivacyPolicy] = useState<LegalContent>(emptyLegalContent);
   const [termsOfService, setTermsOfService] = useState<LegalContent>(emptyLegalContent);
   const [imprint, setImprint] = useState<LegalContent>(emptyLegalContent);
@@ -115,6 +125,87 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           })));
         }
 
+        // Fetch experiences
+        const { data: expData, error: expError } = await supabase.from('experiences').select('*').order('sort_order', { ascending: true });
+        if (expError) console.error('Experiences fetch error:', expError);
+        if (expData && expData.length > 0) {
+          setExperiences(expData.map(e => ({
+            id: e.id,
+            title: e.title,
+            company: e.company,
+            location: e.location,
+            type: e.type,
+            startDate: e.start_date,
+            endDate: e.end_date,
+            duration: e.duration,
+            description: e.description,
+            skills: e.skills || []
+          })));
+        }
+
+        // Fetch educations
+        const { data: eduData, error: eduError } = await supabase.from('educations').select('*').order('sort_order', { ascending: true });
+        if (eduError) console.error('Educations fetch error:', eduError);
+        if (eduData && eduData.length > 0) {
+          setEducations(eduData.map(e => ({
+            id: e.id,
+            institution: e.institution,
+            degree: e.degree,
+            field: e.field,
+            startDate: e.start_date,
+            endDate: e.end_date,
+            grade: e.grade,
+            description: e.description,
+            skills: e.skills || []
+          })));
+        }
+
+        // Fetch certifications
+        const { data: certData, error: certError } = await supabase.from('certifications').select('*').order('sort_order', { ascending: true });
+        if (certError) console.error('Certifications fetch error:', certError);
+        if (certData && certData.length > 0) {
+          setCertifications(certData.map(c => ({
+            id: c.id,
+            name: c.name,
+            issuer: c.issuer,
+            issueDate: c.issue_date,
+            expirationDate: c.expiration_date,
+            credentialId: c.credential_id,
+            credentialUrl: c.credential_url,
+            description: c.description
+          })));
+        }
+
+        // Fetch gallery categories and images
+        const { data: gcData, error: gcError } = await supabase.from('gallery_categories').select('*').order('sort_order', { ascending: true });
+        if (gcError) console.error('Gallery Categories fetch error:', gcError);
+        
+        const { data: giData, error: giError } = await supabase.from('gallery_images').select('*').order('sort_order', { ascending: true });
+        if (giError) console.error('Gallery Images fetch error:', giError);
+
+        if (gcData && giData) {
+          const formattedImages = giData.map(gi => ({
+             id: gi.id,
+             title: gi.title,
+             description: gi.description,
+             imagePath: gi.image_path,
+             thumbnailPath: gi.thumbnail_path,
+             category: gi.category_id,
+             date: gi.date,
+             tags: gi.tags || [],
+             type: gi.type as any,
+             videoPath: gi.video_path
+          }));
+          setGalleryImages(formattedImages);
+
+          setGalleryCategories(gcData.map(gc => ({
+             id: gc.id,
+             name: gc.name,
+             description: gc.description,
+             images: formattedImages.filter(img => img.category === gc.id)
+          })));
+        }
+
         // Fetch all website config
         const { data: configData, error: configError } = await supabase.from('website_config').select('*');
         if (configError) console.error('Config fetch error:', configError);
@@ -148,7 +239,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <DataContext.Provider value={{ 
-        personalInfo, projects, skills, privacyPolicy, termsOfService, imprint, 
+        personalInfo, projects, skills, experiences, educations, certifications, galleryCategories, galleryImages, privacyPolicy, termsOfService, imprint, 
         pageContent, footerContent, quickLinks, contactInfo, websiteTitle, websiteIcon,
         loading, error 
     }}>

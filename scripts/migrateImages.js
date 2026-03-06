@@ -34,6 +34,25 @@ async function uploadFileToSupabase(localPath, storagePath) {
         // Clean up the storage path (remove leading slashes if any)
         const cleanStoragePath = storagePath.replace(/^\/+/, '');
 
+        // Check if file already exists
+        const folderPath = cleanStoragePath.substring(0, cleanStoragePath.lastIndexOf('/'));
+        const fileName = path.basename(cleanStoragePath);
+        
+        const { data: existingFiles, error: listError } = await supabase.storage
+            .from(BUCKET_NAME)
+            .list(folderPath, {
+                limit: 1,
+                search: fileName
+            });
+            
+        if (!listError && existingFiles && existingFiles.length > 0 && existingFiles[0].name === fileName) {
+            console.log(`⏩ File already exists in Supabase, skipping upload: ${cleanStoragePath}`);
+            const { data: publicUrlData } = supabase.storage
+                .from(BUCKET_NAME)
+                .getPublicUrl(cleanStoragePath);
+            return publicUrlData.publicUrl;
+        }
+
         console.log(`Uploading ${localPath} to ${cleanStoragePath}...`);
 
         const { data, error } = await supabase.storage
@@ -128,7 +147,43 @@ async function migrateImages() {
         }
     }
 
-    // 3. Migrate Website Icon (Favicon)
+    // 3. Migrate Gallery Images
+    console.log("\n--- Checking Gallery Images ---");
+    const { data: galleryImages, error: gError } = await supabase.from('gallery_images').select('id, title, image_path, thumbnail_path, video_path');
+    
+    if (!gError && galleryImages) {
+        for (const img of galleryImages) {
+            const updates = {};
+            const safeTitle = img.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
+
+            if (await isLocalPath(img.image_path)) {
+                const newUrl = await uploadFileToSupabase(img.image_path, `gallery/${safeTitle}/${path.basename(img.image_path)}`);
+                if (newUrl) updates.image_path = newUrl;
+            }
+
+            if (await isLocalPath(img.thumbnail_path)) {
+                const newUrl = await uploadFileToSupabase(img.thumbnail_path, `gallery/${safeTitle}/thumb-${path.basename(img.thumbnail_path)}`);
+                if (newUrl) updates.thumbnail_path = newUrl;
+            }
+
+            if (img.video_path && await isLocalPath(img.video_path)) {
+                const newUrl = await uploadFileToSupabase(img.video_path, `gallery/${safeTitle}/${path.basename(img.video_path)}`);
+                if (newUrl) updates.video_path = newUrl;
+            }
+
+            // Apply updates to DB if any
+            if (Object.keys(updates).length > 0) {
+                const { error: updateError } = await supabase.from('gallery_images').update(updates).eq('id', img.id);
+                if (updateError) {
+                    console.error(`❌ Failed to update DB for gallery image ${img.title}:`, updateError.message);
+                } else {
+                    console.log(`✅ Updated DB records for gallery image: ${img.title}`);
+                }
+            }
+        }
+    }
+
+    // 4. Migrate Website Icon (Favicon)
     console.log("\n--- Checking Website Config (Favicon) ---");
     const { data: iconData } = await supabase.from('website_config').select('*').eq('config_key', 'websiteIcon').single();
     if (iconData && await isLocalPath(iconData.config_value)) {

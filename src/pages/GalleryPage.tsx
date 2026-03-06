@@ -8,11 +8,7 @@ const GalleryPage: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('grid');
-    const { pageContent: allPageContent } = useData();
-
-    // TEMPORARY: Assume gallery images array is empty or fetched from data later
-    const galleryImages: GalleryImage[] = [];
-    const galleryCategories: any[] = [];
+    const { pageContent: allPageContent, galleryImages, galleryCategories } = useData();
     const pageContent = (allPageContent?.gallery || {}) as GalleryPageContent;
 
     // Filter images based on selected category

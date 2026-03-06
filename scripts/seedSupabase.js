@@ -28,7 +28,7 @@ async function seed() {
   const data = JSON.parse(rawData);
 
   console.log("Clearing existing data from tables...");
-  const tablesToClear = ['personal_info', 'skills', 'projects', 'website_config'];
+  const tablesToClear = ['personal_info', 'skills', 'projects', 'experiences', 'educations', 'certifications', 'contact_info', 'gallery_categories', 'gallery_images', 'website_config'];
   for (const table of tablesToClear) {
       const { error } = await supabase.from(table).delete().neq('id', '00000000-0000-0000-0000-000000000000');
       if (error) console.error(`Error clearing table ${table}:`, error.message);
@@ -85,6 +85,114 @@ async function seed() {
           sort_order: i
         });
         if (error) console.error(`Error inserting project ${p.title}:`, error.message);
+      }
+  }
+
+  console.log("Uploading experiences...");
+  if (data.experiences && data.experiences.length > 0) {
+      for (let i = 0; i < data.experiences.length; i++) {
+        const e = data.experiences[i];
+        const { error } = await supabase.from('experiences').insert({
+          title: e.title,
+          company: e.company,
+          location: e.location,
+          type: e.type,
+          start_date: e.startDate,
+          end_date: e.endDate,
+          duration: e.duration,
+          description: e.description,
+          skills: e.skills || [],
+          sort_order: i
+        });
+        if (error) console.error(`Error inserting experience ${e.title}:`, error.message);
+      }
+  }
+
+  console.log("Uploading educations...");
+  if (data.educations && data.educations.length > 0) {
+      for (let i = 0; i < data.educations.length; i++) {
+        const ed = data.educations[i];
+        const { error } = await supabase.from('educations').insert({
+          institution: ed.institution,
+          degree: ed.degree,
+          field: ed.field,
+          start_date: ed.startDate,
+          end_date: ed.endDate,
+          grade: ed.grade,
+          description: ed.description,
+          skills: ed.skills || [],
+          sort_order: i
+        });
+        if (error) console.error(`Error inserting education ${ed.institution}:`, error.message);
+      }
+  }
+
+  console.log("Uploading certifications...");
+  if (data.certifications && data.certifications.length > 0) {
+      for (let i = 0; i < data.certifications.length; i++) {
+        const cert = data.certifications[i];
+        const { error } = await supabase.from('certifications').insert({
+          name: cert.name,
+          issuer: cert.issuer,
+          issue_date: cert.issueDate,
+          expiration_date: cert.expirationDate,
+          credential_id: cert.credentialId,
+          credential_url: cert.credentialUrl,
+          description: cert.description,
+          sort_order: i
+        });
+        if (error) console.error(`Error inserting certification ${cert.name}:`, error.message);
+      }
+  }
+
+  console.log("Uploading contact info...");
+  if (data.contactInfo || data.personalInfo) {
+      // Use contactInfo if available, otherwise fallback to personalInfo details to avoid empty contact info
+      const contactData = data.contactInfo || { 
+          email: data.personalInfo?.email, 
+          location: data.personalInfo?.location, 
+          socialLinks: data.personalInfo?.socialLinks || [] 
+      };
+      
+      const { error } = await supabase.from('contact_info').insert({
+          email: contactData.email || '',
+          location: contactData.location || '',
+          social_links: contactData.socialLinks || []
+      });
+      if (error) console.error("Error inserting contact_info:", error.message);
+  }
+
+  console.log("Uploading gallery categories...");
+  if (data.galleryCategories && data.galleryCategories.length > 0) {
+      for (let i = 0; i < data.galleryCategories.length; i++) {
+        const cat = data.galleryCategories[i];
+        const { error } = await supabase.from('gallery_categories').insert({
+          id: cat.id,
+          name: cat.name,
+          description: cat.description,
+          sort_order: i
+        });
+        if (error) console.error(`Error inserting gallery category ${cat.name}:`, error.message);
+      }
+  }
+
+  console.log("Uploading gallery images...");
+  if (data.galleryImages && data.galleryImages.length > 0) {
+      for (let i = 0; i < data.galleryImages.length; i++) {
+        const img = data.galleryImages[i];
+        const { error } = await supabase.from('gallery_images').insert({
+          title: img.title,
+          description: img.description,
+          image_path: img.imagePath,
+          thumbnail_path: img.thumbnailPath,
+          category_id: img.categoryId,
+          date: img.date,
+          tags: img.tags || [],
+          type: img.type || 'image',
+          video_path: img.videoPath,
+          sort_order: i
+        });
+        if (error) console.error(`Error inserting gallery image ${img.title}:`, error.message);
       }
   }
 

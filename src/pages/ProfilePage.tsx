@@ -18,12 +18,7 @@ const getIcon = (iconName: string | null | undefined) => {
 };
 
 const ProfilePage: React.FC = () => {
-    const { personalInfo } = useData();
-    
-    // TEMPORARY: Assume these are currently empty or provided by Supabase later
-    const experiences: any[] = [];
-    const educations: any[] = [];
-    const certifications: any[] = [];
+    const { personalInfo, experiences, educations, certifications } = useData();
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-12">

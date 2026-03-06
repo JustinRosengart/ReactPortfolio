@@ -11,10 +11,7 @@ const Header: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const {isDarkMode, toggleTheme} = useTheme();
-    const { personalInfo, projects } = useData();
-
-    // TEMPORARY: Assume gallery images array is empty or fetched from context later
-    const galleryImages: any[] = [];
+    const { personalInfo, projects, galleryImages } = useData();
 
     const allNavItems: NavItem[] = [
         {id: 'home', label: 'Home', icon: House},

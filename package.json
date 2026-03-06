@@ -34,7 +34,7 @@
     "generate-manifests": "node scripts/generateImageManifests.js",
     "dev:builder": "concurrently \"set REACT_APP_ENABLE_BUILDER=true&& npm run start\" \"node server/index.js\"",
     "seed-db": "node scripts/seedSupabase.js",
-    "migrate-images": "node scripts/migrateImages.js"
+    "migrate-images": "npm run optimize-images && node scripts/migrateImages.js"
   },
   "eslintConfig": {
     "extends": [
