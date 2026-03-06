@@ -3,15 +3,15 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import {Briefcase, CircleUserRound, House, Image, Mail, Menu, Moon, Sun, X} from 'lucide-react';
 import {NavItem} from '../types';
 import {useTheme} from "../contexts/ThemeContext";
-import {galleryImages, personalInfo} from '../data/personal';
-import {projects} from '../data/projects';
 import {themeClasses} from '../config/theme';
+import { useData } from '../context/DataContext';
 
 const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const {isDarkMode, toggleTheme} = useTheme();
+    const { personalInfo, projects, galleryImages } = useData();
 
     const allNavItems: NavItem[] = [
         {id: 'home', label: 'Home', icon: House},
@@ -22,7 +22,7 @@ const Header: React.FC = () => {
     ];
 
     const navItems = allNavItems.filter(item => {
-        if (item.id === 'projects') return projects.length > 0;
+        if (item.id === 'projects') return (projects || []).length > 0;
         if (item.id === 'gallery') return galleryImages.length > 0;
         return true;
     });
@@ -30,7 +30,7 @@ const Header: React.FC = () => {
     const getCurrentPage = () => {
         const path = location.pathname;
         if (path === '/' || path === '/home') return 'home';
-        if ((path === '/projects' || path.startsWith('/projects/')) && projects.length > 0) return 'projects';
+        if ((path === '/projects' || path.startsWith('/projects/')) && (projects || []).length > 0) return 'projects';
         if (path === '/gallery' && galleryImages.length > 0) return 'gallery';
         if (path === '/contact') return 'contact';
         if (path === '/profile') return 'profile';
@@ -43,7 +43,7 @@ const Header: React.FC = () => {
                 navigate('/home');
                 break;
             case 'projects':
-                if (projects.length > 0) {
+                if ((projects || []).length > 0) {
                     navigate('/projects');
                 } else {
                     navigate('/home');

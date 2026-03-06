@@ -1,13 +1,12 @@
 import React from 'react';
 import {Clock, Code, Users, Wifi} from 'lucide-react';
 import {Skill} from '../types';
-import {projects} from '../data/projects';
-import {personalInfo, skillsData} from '../data/personal';
-import {pageContent} from '../data/website';
 import { themeClasses } from '../config/theme';
-import { EditableText } from '../components/Builder/EditableText';
+import { useData } from '../context/DataContext';
 
 const LandingPage: React.FC = () => {
+    const { personalInfo, skills: skillsData, projects, pageContent } = useData();
+
     // Helper function to render icons dynamically based on string
     const getIcon = (iconName: string): React.ReactNode => {
         const iconProps = `w-6 h-6 ${themeClasses.text.accent}`;
@@ -26,7 +25,7 @@ const LandingPage: React.FC = () => {
     };
 
     // Convert skillsData to Skill[] format with dynamic icons
-    const skills: Skill[] = skillsData.map(skill => ({
+    const skills: Skill[] = (skillsData || []).map(skill => ({
         name: skill.title,
         description: skill.description,
         icon: getIcon(skill.icon)
@@ -47,23 +46,13 @@ const LandingPage: React.FC = () => {
                         </div>
                         <div>
                             <h1 className={`text-4xl lg:text-5xl font-bold ${themeClasses.text.primary} mb-6`}>
-                                <EditableText 
-                                    value={personalInfo.name} 
-                                    path="personalInfo.name" 
-                                />
+                                {personalInfo.name}
                             </h1>
                             <p className={`text-lg ${themeClasses.text.secondary} mb-6`}>
-                                <EditableText 
-                                    value={personalInfo.titleShort} 
-                                    path="personalInfo.titleShort" 
-                                />
+                                {personalInfo.titleShort}
                             </p>
                             <div className={`${themeClasses.text.secondary} leading-relaxed`}>
-                                <EditableText 
-                                    value={personalInfo.about} 
-                                    path="personalInfo.about" 
-                                    multiline
-                                />
+                                {personalInfo.about}
                             </div>
                         </div>
                     </div>
@@ -101,22 +90,15 @@ const LandingPage: React.FC = () => {
             </section>
 
             {/* Projects Statistics - Only show if projects exist */}
-            {projects.length > 0 && (
+            {projects && projects.length > 0 && (
                 <section className="py-16 bg-white dark:bg-gray-800 transition-colors duration-200">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-12">
                             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                                <EditableText 
-                                    value={pageContent.projects.title} 
-                                    path="pageContent.projects.title" 
-                                />
+                                {pageContent.projects.title}
                             </h2>
                             <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                                <EditableText 
-                                    value={pageContent.projects.description} 
-                                    path="pageContent.projects.description" 
-                                    multiline
-                                />
+                                {pageContent.projects.description}
                             </p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -126,10 +108,7 @@ const LandingPage: React.FC = () => {
                                     className="text-4xl font-bold text-purple-500 dark:text-purple-400 mb-2">{projects.length}</div>
                                 <div
                                     className="text-gray-600 dark:text-gray-300 font-medium">
-                                    <EditableText 
-                                        value={pageContent.about.stats.projectsLabel} 
-                                        path="pageContent.about.stats.projectsLabel" 
-                                    />
+                                    {pageContent.about.stats.projectsLabel}
                                 </div>
                                 <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Real-world applications</div>
                             </div>

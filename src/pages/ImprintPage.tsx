@@ -1,11 +1,12 @@
 import React from 'react';
 import {ArrowLeft} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
-import {imprintContent, personalInfo} from '../data/personal';
 import { themeClasses } from '../config/theme';
+import { useData } from '../context/DataContext';
 
 const ImprintPage: React.FC = () => {
     const navigate = useNavigate();
+    const { personalInfo, imprint: imprintContent } = useData();
 
     const handleBack = () => {
         navigate(-1);

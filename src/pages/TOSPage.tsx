@@ -1,11 +1,12 @@
 import React from 'react';
 import {ArrowLeft} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
-import {personalInfo, termsOfServiceContent} from '../data/personal';
 import { themeClasses } from '../config/theme';
+import { useData } from '../context/DataContext';
 
 const TermsOfServicePage: React.FC = () => {
     const navigate = useNavigate();
+    const { personalInfo, termsOfService: termsOfServiceContent } = useData();
 
     const handleBack = () => {
         navigate(-1);

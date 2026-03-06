@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react';
 import { themeClasses } from '../config/theme';
 import { getProjectImages } from '../utils/imageUtils';
-import { EditableImage } from './Builder/EditableImage';
-import { useBuilder } from '../context/BuilderContext';
 
 interface ProjectGalleryProps {
     project: { images?: string[], imageFolder?: string, image: string };
@@ -11,11 +9,10 @@ interface ProjectGalleryProps {
     projectIndex: number;
 }
 
-const ProjectGallery: React.FC<ProjectGalleryProps> = ({ project, projectTitle, projectIndex }) => {
+const ProjectGallery: React.FC<ProjectGalleryProps> = ({ project, projectTitle }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [images, setImages] = useState<string[]>([project.image]);
-    const { isBuilderMode } = useBuilder();
     
     useEffect(() => {
         const loadImages = async () => {
@@ -62,9 +59,7 @@ const ProjectGallery: React.FC<ProjectGalleryProps> = ({ project, projectTitle, 
     };
 
     const openModal = () => {
-        if (!isBuilderMode) {
-            setIsModalOpen(true);
-        }
+        setIsModalOpen(true);
     };
 
     const closeModal = () => {
@@ -75,42 +70,14 @@ const ProjectGallery: React.FC<ProjectGalleryProps> = ({ project, projectTitle, 
         return null;
     }
 
-    // Determine if the current image is editable
-    const getEditablePath = (index: number) => {
-        if (project.imageFolder) return null; // Cannot edit folder images
-        
-        if (project.images && project.images.length > 0) {
-            return `projects.${projectIndex}.images.${index}`;
-        }
-        
-        // Fallback to single image
-        if (index === 0) {
-            return `projects.${projectIndex}.image`;
-        }
-        
-        return null;
-    };
-
     const renderImage = (src: string, index: number, isModal = false) => {
-        const editablePath = getEditablePath(index);
         const imgClasses = isModal 
             ? "max-w-full max-h-[90vh] object-contain rounded-lg" 
             : "w-full h-full object-cover object-top rounded-lg";
 
-        if (editablePath && !isModal) {
-            return (
-                <EditableImage
-                    path={editablePath}
-                    value={src}
-                    alt={`${projectTitle} screenshot ${index + 1}`}
-                    className={imgClasses}
-                    containerClassName="w-full h-full"
-                />
-            );
-        }
-
         return (
             <img
+                key={index}
                 src={src}
                 alt={`${projectTitle} screenshot ${index + 1}`}
                 className={imgClasses}
@@ -125,11 +92,9 @@ const ProjectGallery: React.FC<ProjectGalleryProps> = ({ project, projectTitle, 
             <div className={`${themeClasses.card.base} shadow-lg p-8 mb-8`}>
                 <div className={`${themeClasses.bg.subtle} rounded-lg overflow-hidden h-96 transition-colors duration-200 relative group cursor-pointer`} onClick={openModal}>
                     {renderImage(images[0], 0)}
-                    {!isBuilderMode && (
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center pointer-events-none">
-                            <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" size={32} />
-                        </div>
-                    )}
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center pointer-events-none">
+                        <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" size={32} />
+                    </div>
                 </div>
                 
                 {isModalOpen && (
@@ -154,11 +119,9 @@ const ProjectGallery: React.FC<ProjectGalleryProps> = ({ project, projectTitle, 
             <div className="relative">
                 <div className={`${themeClasses.bg.subtle} rounded-lg overflow-hidden h-96 transition-colors duration-200 relative group cursor-pointer`} onClick={openModal}>
                     {renderImage(images[currentIndex], currentIndex)}
-                    {!isBuilderMode && (
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center pointer-events-none">
-                            <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" size={32} />
-                        </div>
-                    )}
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center pointer-events-none">
+                        <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" size={32} />
+                    </div>
                 </div>
 
                 {images.length > 1 && (

@@ -14,7 +14,7 @@ build:
     - echo "Logging in to GitLab Container Registry..."
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - echo "Building Docker image $IMAGE_TAG"
-    - docker build -t $IMAGE_TAG .
+    - docker build --build-arg REACT_APP_SUPABASE_URL="$REACT_APP_SUPABASE_URL" --build-arg REACT_APP_SUPABASE_ANON_KEY="$REACT_APP_SUPABASE_ANON_KEY" -t $IMAGE_TAG .
     - echo "Pushing Docker image to registry..."
     - docker push $IMAGE_TAG
   rules:

@@ -2,20 +2,11 @@ import React from 'react';
 import {ArrowLeft} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import { themeClasses } from '../config/theme';
-import { useBuilder } from '../context/BuilderContext';
-import { privacyPolicyContent as defaultPrivacyContent, personalInfo as defaultPersonalInfo } from '../data/personal';
+import { useData } from '../context/DataContext';
 
 const PrivacyPolicyPage: React.FC = () => {
     const navigate = useNavigate();
-    const { content } = useBuilder();
-    
-    // Fallback to imported data if context data structure is missing (though it shouldn't be)
-    // Note: In a real app, we might want to store legal content in the JSON structure too.
-    // For now, we'll assume the structure matches what we expect or fallback to the static import.
-    const personalInfo = content.personalInfo || defaultPersonalInfo;
-    // Since legal content isn't in the JSON yet, we use the static import. 
-    // If you want to make this editable, you'd need to add it to website.json and the context.
-    const privacyPolicyContent = defaultPrivacyContent;
+    const { personalInfo, privacyPolicy: privacyPolicyContent } = useData();
 
     const handleBack = () => {
         navigate(-1);
