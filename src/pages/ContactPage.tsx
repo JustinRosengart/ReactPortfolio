@@ -3,6 +3,7 @@ import { Mail, MapPin, CheckCircle, XCircle } from 'lucide-react';
 import { themeClasses } from '../config/theme';
 import { useData } from '../context/DataContext';
 import SocialLinks from '../components/SocialLinks';
+import { motion } from 'framer-motion';
 
 const ContactPage: React.FC = () => {
     const { personalInfo, pageContent, contactInfo } = useData();
@@ -42,26 +43,50 @@ const ContactPage: React.FC = () => {
         }
     };
 
+    const fadeInUp = {
+        hidden: { opacity: 0, y: 30 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+    };
+
+    const staggerContainer = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
     return (
         <div className="max-w-4xl mx-auto px-4 py-12">
-            <div className="text-center mb-12">
-                <h1 className={`text-4xl font-bold ${themeClasses.text.primary} mb-4`}>
+            <motion.div 
+                initial="hidden"
+                animate="visible"
+                variants={staggerContainer}
+                className="text-center mb-12"
+            >
+                <motion.h1 variants={fadeInUp} className={`text-4xl font-bold ${themeClasses.text.primary} mb-4`}>
                     {pageContent.contact.title}
-                </h1>
-                <p className={`text-xl ${themeClasses.text.secondary} max-w-2xl mx-auto`}>
+                </motion.h1>
+                <motion.p variants={fadeInUp} className={`text-xl ${themeClasses.text.secondary} max-w-2xl mx-auto`}>
                     {pageContent.contact.description}
-                </p>
-            </div>
+                </motion.p>
+            </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 {/* Contact Info */}
-                <div>
-                    <h2 className={`text-2xl font-bold ${themeClasses.text.primary} mb-8`}>
+                <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    variants={staggerContainer}
+                >
+                    <motion.h2 variants={fadeInUp} className={`text-2xl font-bold ${themeClasses.text.primary} mb-8`}>
                         {pageContent.contact.sectionTitle}
-                    </h2>
+                    </motion.h2>
                     
                     <div className="space-y-8">
-                        <div className="flex items-center space-x-4">
+                        <motion.div variants={fadeInUp} className="flex items-center space-x-4">
                             <div className={`w-12 h-12 ${themeClasses.bg.primaryLight} rounded-full flex items-center justify-center transition-colors duration-200`}>
                                 <MapPin className={`w-6 h-6 ${themeClasses.text.secondary}`} />
                             </div>
@@ -69,9 +94,9 @@ const ContactPage: React.FC = () => {
                                 <p className={`text-sm ${themeClasses.text.accent}`}>{pageContent.contact.contactLabels.location}</p>
                                 <p className={`font-medium ${themeClasses.text.primary}`}>{personalInfo.location}</p>
                             </div>
-                        </div>
+                        </motion.div>
 
-                        <div className="flex items-center space-x-4">
+                        <motion.div variants={fadeInUp} className="flex items-center space-x-4">
                             <div className={`w-12 h-12 ${themeClasses.bg.primaryLight} rounded-full flex items-center justify-center transition-colors duration-200`}>
                                 <Mail className={`w-6 h-6 ${themeClasses.text.secondary}`} />
                             </div>
@@ -79,16 +104,20 @@ const ContactPage: React.FC = () => {
                                 <p className={`text-sm ${themeClasses.text.accent}`}>{pageContent.contact.contactLabels.email}</p>
                                 <p className={`font-medium ${themeClasses.text.primary}`}>{personalInfo.email}</p>
                             </div>
-                        </div>
+                        </motion.div>
 
-                        <div className="pt-2">
+                        <motion.div variants={fadeInUp} className="pt-2">
                             <SocialLinks />
-                        </div>
+                        </motion.div>
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Contact Form */}
-                <div>
+                <motion.div
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                >
                     <div className="space-y-6">
                         <div>
                             <label className={`block text-sm font-medium ${themeClasses.text.secondary} mb-2`}>
@@ -133,11 +162,14 @@ const ContactPage: React.FC = () => {
                         </div>
 
                         {submitStatus !== 'idle' && (
-                            <div className={`p-4 rounded-md flex items-center space-x-2 ${
-                                submitStatus === 'success' 
-                                    ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' 
-                                    : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
-                            }`}>
+                            <motion.div 
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                className={`p-4 rounded-md flex items-center space-x-2 ${
+                                    submitStatus === 'success' 
+                                        ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' 
+                                        : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
+                                }`}>
                                 {submitStatus === 'success' ? (
                                     <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
                                 ) : (
@@ -150,18 +182,20 @@ const ContactPage: React.FC = () => {
                                 }`}>
                                     {submitMessage}
                                 </span>
-                            </div>
+                            </motion.div>
                         )}
 
-                        <button
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                             onClick={handleSubmit}
                             disabled={isSubmitting}
                             className={`w-full ${themeClasses.button.primary} disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
                         >
                             {isSubmitting ? 'Sending...' : pageContent.contact.formLabels.submit}
-                        </button>
+                        </motion.button>
                     </div>
-                </div>
+                </motion.div>
             </div>
         </div>
     );

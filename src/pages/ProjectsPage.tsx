@@ -3,6 +3,7 @@ import {useNavigate} from 'react-router-dom';
 import {Grid, List, CheckCircle, Clock, Calendar, Pause, ArrowRight, Code} from 'lucide-react';
 import {themeClasses} from '../config/theme';
 import { useData } from '../context/DataContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const ProjectsPage: React.FC = () => {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -75,11 +76,31 @@ const ProjectsPage: React.FC = () => {
         }
     };
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 30 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+    };
+
     return (
         <div className={`min-h-screen ${themeClasses.bg.page} transition-colors duration-200 mb-12`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 {/* Header */}
-                <div className="text-center mb-12">
+                <motion.div 
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                    className="text-center mb-12"
+                >
                     <h1 className={`text-3xl font-bold ${themeClasses.text.accent} mb-4`}>
                         {pageContent.projects.title}
                     </h1>
@@ -118,10 +139,15 @@ const ProjectsPage: React.FC = () => {
                             }
                         })()}
                     </p>
-                </div>
+                </motion.div>
 
                 {/* View Toggle */}
-                <div className="flex items-center justify-center space-x-2 mb-8">
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="flex items-center justify-center space-x-2 mb-8"
+                >
                     <button
                         onClick={() => setViewMode('grid')}
                         className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
@@ -144,144 +170,164 @@ const ProjectsPage: React.FC = () => {
                         <List size={16}/>
                         <span>{pageContent.projects.viewToggle.list}</span>
                     </button>
-                </div>
+                </motion.div>
             </div>
 
             {/* Projects Grid/List */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className={viewMode === 'grid' ? `grid gap-8 ${getGridColumns()}` : "space-y-8 max-w-4xl mx-auto"}>
-                    {projectsToShow.map((project: any, index: number) => {
-                        const statusConfig = getStatusConfig(project.status);
-                        const StatusIcon = statusConfig.icon;
+                <motion.div 
+                    key={`${viewMode}-${showAll}`}
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className={viewMode === 'grid' ? `grid gap-8 ${getGridColumns()}` : "space-y-8 max-w-4xl mx-auto"}
+                >
+                    <AnimatePresence mode="popLayout">
+                        {projectsToShow.map((project: any, index: number) => {
+                            const statusConfig = getStatusConfig(project.status);
+                            const StatusIcon = statusConfig.icon;
 
-                        if (viewMode === 'list') {
+                            if (viewMode === 'list') {
+                                return (
+                                    <motion.div 
+                                        key={project.url} 
+                                        variants={itemVariants}
+                                        layout
+                                        whileHover={{ y: -5 }}
+                                        className={`${themeClasses.card.base} overflow-hidden ${themeClasses.card.hover} transition-all duration-300 group`}
+                                    >
+                                        <div className="flex">
+                                            {/* Project Image/Preview - Smaller for list view */}
+                                            <div className={`${themeClasses.bg.subtle} p-4 transition-colors duration-200 flex-shrink-0`}>
+                                                <div className={`${themeClasses.bg.card} rounded-lg shadow-sm overflow-hidden w-32 h-24 flex items-center justify-center transition-all duration-300 group-hover:shadow-lg relative`}>
+                                                    {project.imageBanner ? (
+                                                        <img
+                                                            src={project.imageBanner}
+                                                            alt={`${project.title} screenshot`}
+                                                            className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                                                        />
+                                                    ) : (
+                                                        <div className={`text-center ${themeClasses.text.secondary} w-full h-full flex flex-col items-center justify-center`}>
+                                                            <Code size={16} className="mx-auto mb-1"/>
+                                                            <span className="text-xs">Preview</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Project Content - Horizontal layout */}
+                                            <div className="flex-1 p-4 flex items-center">
+                                                <div className="flex-1">
+                                                    {/* Title and Status */}
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <h3 className={`text-lg font-bold ${themeClasses.text.accent} group-hover:text-blue-500 transition-colors duration-200`}>
+                                                            {project.title}
+                                                        </h3>
+                                                        <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium border ${statusConfig.bgColor} ${statusConfig.color} ${statusConfig.borderColor} transition-colors duration-200 ml-4`}>
+                                                            <StatusIcon size={10}/>
+                                                            <span>
+                                                                {project.status}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <p className={`${themeClasses.text.secondary} mb-3 text-sm line-clamp-2`}>
+                                                        {project.description}
+                                                    </p>
+
+                                                    {/* Technologies - Horizontal compact */}
+                                                    <div className="flex flex-wrap gap-1 mb-3">
+                                                        {project.technologies.slice(0, 4).map((tech: string, techIndex: number) => (
+                                                            <span key={techIndex} className={`px-2 py-0.5 ${themeClasses.bg.primaryLight} ${themeClasses.text.accent} rounded text-xs font-medium transition-colors duration-200`}>
+                                                                {tech}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* Action Buttons - Vertical compact */}
+                                                <div className="flex flex-col space-y-2 ml-4 flex-shrink-0">
+                                                    <button onClick={() => handleViewProject(project.url)} className={`flex items-center space-x-1 ${themeClasses.button.primary} px-3 py-2 text-sm font-medium transition-all duration-200`}>
+                                                        <span>Details</span>
+                                                        <ArrowRight size={14}/>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                );
+                            }
+
                             return (
-                                <div key={project.url} className={`${themeClasses.card.base} overflow-hidden ${themeClasses.card.hover} transition-all duration-300 group`}>
-                                    <div className="flex">
-                                        {/* Project Image/Preview - Smaller for list view */}
-                                        <div className={`${themeClasses.bg.subtle} p-4 transition-colors duration-200 flex-shrink-0`}>
-                                            <div className={`${themeClasses.bg.card} rounded-lg shadow-sm overflow-hidden w-32 h-24 flex items-center justify-center transition-all duration-300 group-hover:shadow-lg relative`}>
-                                                {project.imageBanner ? (
-                                                    <img
-                                                        src={project.imageBanner}
-                                                        alt={`${project.title} screenshot`}
-                                                        className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
-                                                    />
-                                                ) : (
-                                                    <div className={`text-center ${themeClasses.text.secondary} w-full h-full flex flex-col items-center justify-center`}>
-                                                        <Code size={16} className="mx-auto mb-1"/>
-                                                        <span className="text-xs">Preview</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Project Content - Horizontal layout */}
-                                        <div className="flex-1 p-4 flex items-center">
-                                            <div className="flex-1">
-                                                {/* Title and Status */}
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <h3 className={`text-lg font-bold ${themeClasses.text.accent} group-hover:text-blue-500 transition-colors duration-200`}>
-                                                        {project.title}
-                                                    </h3>
-                                                    <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium border ${statusConfig.bgColor} ${statusConfig.color} ${statusConfig.borderColor} transition-colors duration-200 ml-4`}>
-                                                        <StatusIcon size={10}/>
-                                                        <span>
-                                                            {project.status}
-                                                        </span>
-                                                    </div>
+                                <motion.div 
+                                    key={project.url} 
+                                    variants={itemVariants}
+                                    layout
+                                    whileHover={{ y: -5 }}
+                                    className={`${themeClasses.card.base} overflow-hidden ${themeClasses.card.hover} transition-all duration-300 group h-full flex flex-col`}
+                                >
+                                    {/* Project Image/Preview */}
+                                    <div className={`${themeClasses.bg.subtle} p-6 transition-colors duration-200`}>
+                                        <div className={`${themeClasses.bg.card} rounded-lg shadow-sm overflow-hidden h-52 flex items-center justify-center transition-all duration-300 group-hover:shadow-lg relative`}>
+                                            {project.imageBanner ? (
+                                                <img
+                                                    src={project.imageBanner}
+                                                    alt={`${project.title} screenshot`}
+                                                    className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                                                />
+                                            ) : (
+                                                <div className={`text-center ${themeClasses.text.secondary} w-full h-full flex flex-col items-center justify-center`}>
+                                                    <Code size={32} className="mx-auto mb-2"/>
+                                                    <span className="text-sm">Project Preview</span>
                                                 </div>
-
-                                                <p className={`${themeClasses.text.secondary} mb-3 text-sm line-clamp-2`}>
-                                                    {project.description}
-                                                </p>
-
-                                                {/* Technologies - Horizontal compact */}
-                                                <div className="flex flex-wrap gap-1 mb-3">
-                                                    {project.technologies.slice(0, 4).map((tech: string, techIndex: number) => (
-                                                        <span key={techIndex} className={`px-2 py-0.5 ${themeClasses.bg.primaryLight} ${themeClasses.text.accent} rounded text-xs font-medium transition-colors duration-200`}>
-                                                            {tech}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            {/* Action Buttons - Vertical compact */}
-                                            <div className="flex flex-col space-y-2 ml-4 flex-shrink-0">
-                                                <button onClick={() => handleViewProject(project.url)} className={`flex items-center space-x-1 ${themeClasses.button.primary} px-3 py-2 text-sm font-medium transition-all duration-200`}>
-                                                    <span>Details</span>
-                                                    <ArrowRight size={14}/>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        }
-
-                        return (
-                            <div key={project.url} className={`${themeClasses.card.base} overflow-hidden ${themeClasses.card.hover} transition-all duration-300 group h-full flex flex-col`}>
-                                {/* Project Image/Preview */}
-                                <div className={`${themeClasses.bg.subtle} p-6 transition-colors duration-200`}>
-                                    <div className={`${themeClasses.bg.card} rounded-lg shadow-sm overflow-hidden h-52 flex items-center justify-center transition-all duration-300 group-hover:shadow-lg relative`}>
-                                        {project.imageBanner ? (
-                                            <img
-                                                src={project.imageBanner}
-                                                alt={`${project.title} screenshot`}
-                                                className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
-                                            />
-                                        ) : (
-                                            <div className={`text-center ${themeClasses.text.secondary} w-full h-full flex flex-col items-center justify-center`}>
-                                                <Code size={32} className="mx-auto mb-2"/>
-                                                <span className="text-sm">Project Preview</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Project Content */}
-                                <div className="p-6 flex flex-col flex-1">
-                                    {/* Project Title and Status */}
-                                    <div className="flex items-start justify-between mb-4">
-                                        <h3 className={`text-xl font-bold ${themeClasses.text.accent} flex-1 mr-3 transition-colors duration-200`}>
-                                            {project.title}
-                                        </h3>
-                                        <div className={`flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs font-medium border ${statusConfig.bgColor} ${statusConfig.color} ${statusConfig.borderColor} flex-shrink-0 transition-colors duration-200`}>
-                                            <StatusIcon size={12}/>
-                                            <span>
-                                                {project.status}
-                                            </span>
+                                            )}
                                         </div>
                                     </div>
 
-                                    <p className={`${themeClasses.text.secondary} mb-6 leading-relaxed text-sm`}>
-                                        {project.description}
-                                    </p>
-
-                                    {/* Technologies */}
-                                    <div className="mb-6">
-                                        <h4 className={`text-sm font-semibold ${themeClasses.text.accent} mb-3`}>Technologies</h4>
-                                        <div className="flex flex-wrap gap-2">
-                                            {project.technologies.map((tech: string, techIndex: number) => (
-                                                <span key={techIndex} className={`px-2 py-1 ${themeClasses.bg.primaryLight} ${themeClasses.text.accent} rounded-md text-xs font-medium transition-colors duration-200`}>
-                                                    {tech}
+                                    {/* Project Content */}
+                                    <div className="p-6 flex flex-col flex-1">
+                                        {/* Project Title and Status */}
+                                        <div className="flex items-start justify-between mb-4">
+                                            <h3 className={`text-xl font-bold ${themeClasses.text.accent} flex-1 mr-3 transition-colors duration-200`}>
+                                                {project.title}
+                                            </h3>
+                                            <div className={`flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs font-medium border ${statusConfig.bgColor} ${statusConfig.color} ${statusConfig.borderColor} flex-shrink-0 transition-colors duration-200`}>
+                                                <StatusIcon size={12}/>
+                                                <span>
+                                                    {project.status}
                                                 </span>
-                                            ))}
+                                            </div>
+                                        </div>
+
+                                        <p className={`${themeClasses.text.secondary} mb-6 leading-relaxed text-sm`}>
+                                            {project.description}
+                                        </p>
+
+                                        {/* Technologies */}
+                                        <div className="mb-6">
+                                            <h4 className={`text-sm font-semibold ${themeClasses.text.accent} mb-3`}>Technologies</h4>
+                                            <div className="flex flex-wrap gap-2">
+                                                {project.technologies.map((tech: string, techIndex: number) => (
+                                                    <span key={techIndex} className={`px-2 py-1 ${themeClasses.bg.primaryLight} ${themeClasses.text.accent} rounded-md text-xs font-medium transition-colors duration-200`}>
+                                                        {tech}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="space-y-4 mt-auto">
+                                            <button onClick={() => handleViewProject(project.url)} className={`w-full flex items-center justify-center space-x-2 ${themeClasses.button.primary} py-3 font-medium group-hover:shadow-lg transition-all duration-200`}>
+                                                <span>View Details</span>
+                                                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-200"/>
+                                            </button>
                                         </div>
                                     </div>
-
-                                    {/* Action Buttons */}
-                                    <div className="space-y-4 mt-auto">
-                                        <button onClick={() => handleViewProject(project.url)} className={`w-full flex items-center justify-center space-x-2 ${themeClasses.button.primary} py-3 font-medium group-hover:shadow-lg transition-all duration-200`}>
-                                            <span>View Details</span>
-                                            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-200"/>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                                </motion.div>
+                            );
+                        })}
+                    </AnimatePresence>
+                </motion.div>
             </div>
 
             {/* Show More/Less Button */}

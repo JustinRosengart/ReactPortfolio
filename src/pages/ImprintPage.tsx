@@ -3,6 +3,7 @@ import {ArrowLeft} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import { themeClasses } from '../config/theme';
 import { useData } from '../context/DataContext';
+import { motion } from 'framer-motion';
 
 const ImprintPage: React.FC = () => {
     const navigate = useNavigate();
@@ -12,19 +13,32 @@ const ImprintPage: React.FC = () => {
         navigate(-1);
     };
 
+    const fadeInUp = {
+        hidden: { opacity: 0, y: 30 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+    };
+
     return (
         <div className={`min-h-screen ${themeClasses.bg.page} transition-colors duration-200`}>
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 {/* Back Button */}
-                <button
+                <motion.button
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5 }}
                     onClick={handleBack}
                     className={`flex items-center space-x-2 ${themeClasses.text.secondary} ${themeClasses.text.accentHover} mb-8`}
                 >
                     <ArrowLeft size={20}/>
                     <span>Back</span>
-                </button>
+                </motion.button>
 
-                <div className={`${themeClasses.card.base} p-8`}>
+                <motion.div 
+                    initial="hidden"
+                    animate="visible"
+                    variants={fadeInUp}
+                    className={`${themeClasses.card.base} p-8`}
+                >
                     <h1 className={`text-3xl font-bold ${themeClasses.text.accent} mb-8`}>Imprint</h1>
 
                     <div className="prose max-w-none">
@@ -72,7 +86,7 @@ const ImprintPage: React.FC = () => {
                             );
                         })}
                     </div>
-                </div>
+                </motion.div>
             </div>
         </div>
     );

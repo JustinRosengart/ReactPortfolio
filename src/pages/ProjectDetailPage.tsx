@@ -5,6 +5,7 @@ import { themeClasses } from '../config/theme';
 import ProjectGallery from '../components/ProjectGallery';
 import { useData } from '../context/DataContext';
 import LoadingScreen from '../components/LoadingScreen';
+import { motion } from 'framer-motion';
 
 // React Markdown with custom components for styling
 import ReactMarkdown from 'react-markdown';
@@ -156,31 +157,53 @@ const ProjectDetailPage: React.FC = () => {
         navigate('/projects');
     };
 
+    const fadeInUp = {
+        hidden: { opacity: 0, y: 30 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+    };
+
+    const staggerContainer = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
     return (
         <div className={`min-h-screen ${themeClasses.bg.page} transition-colors duration-200`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 {/* Back Button */}
-                <button
+                <motion.button
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5 }}
                     onClick={handleBack}
                     className={`flex items-center space-x-2 ${themeClasses.button.secondary} mb-8`}
                 >
                     <ArrowLeft size={20}/>
                     <span>Back to Projects</span>
-                </button>
+                </motion.button>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     {/* Project Content */}
-                    <div>
-                        <h1 className={`text-4xl font-bold ${themeClasses.text.primary} mb-6`}>
+                    <motion.div
+                        initial="hidden"
+                        animate="visible"
+                        variants={staggerContainer}
+                    >
+                        <motion.h1 variants={fadeInUp} className={`text-4xl font-bold ${themeClasses.text.primary} mb-6`}>
                             {project.title}
-                        </h1>
+                        </motion.h1>
 
-                        <p className={`text-lg ${themeClasses.text.secondary} mb-8 leading-relaxed`}>
+                        <motion.p variants={fadeInUp} className={`text-lg ${themeClasses.text.secondary} mb-8 leading-relaxed`}>
                             {project.description}
-                        </p>
+                        </motion.p>
 
                         {/* Key Features */}
-                        <div className="mb-8">
+                        <motion.div variants={fadeInUp} className="mb-8">
                             <h2 className={`text-2xl font-bold ${themeClasses.text.primary} mb-6`}>Key Features</h2>
                             <div className="space-y-4">
                                 {(project.features || []).map((feature: string, index: number) => (
@@ -193,10 +216,10 @@ const ProjectDetailPage: React.FC = () => {
                                     </div>
                                 ))}
                             </div>
-                        </div>
+                        </motion.div>
 
                         {/* Technologies Used */}
-                        <div className="mb-8">
+                        <motion.div variants={fadeInUp} className="mb-8">
                             <h2 className={`text-2xl font-bold ${themeClasses.text.primary} mb-6`}>Technologies Used</h2>
                             <div className="flex flex-wrap gap-3 w-full">
                                 {(project.technologies || []).map((tech: string, index: number) => (
@@ -208,10 +231,10 @@ const ProjectDetailPage: React.FC = () => {
                                     </span>
                                 ))}
                             </div>
-                        </div>
+                        </motion.div>
 
                         {/* Action Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-4">
+                        <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4">
                             {project.demoUrl && (
                                 <a
                                     href={project.demoUrl}
@@ -234,11 +257,16 @@ const ProjectDetailPage: React.FC = () => {
                                     <span>Repository</span>
                                 </a>
                             )}
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
 
                     {/* Project Gallery */}
-                    <div className="lg:order-first">
+                    <motion.div 
+                        initial={{ opacity: 0, x: 30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        className="lg:order-first"
+                    >
                         <ProjectGallery 
                             project={project}
                             projectTitle={project.title}
@@ -247,7 +275,7 @@ const ProjectDetailPage: React.FC = () => {
 
                         {/* Project Stats Card */}
                         <div
-                            className={`${themeClasses.card.base} p-6`}>
+                            className={`${themeClasses.card.base} p-6 mt-8`}>
                             <h3 className={`text-xl font-bold ${themeClasses.text.primary} mb-4`}>Project Overview</h3>
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center">
@@ -284,14 +312,20 @@ const ProjectDetailPage: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
 
                 {/* Additional Project Details - Now from Markdown */}
                 {project.additionalInfo && (
-                    <div className={`mt-16 ${themeClasses.card.base} p-8`}>
+                    <motion.div 
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: "-50px" }}
+                        variants={fadeInUp}
+                        className={`mt-16 ${themeClasses.card.base} p-8`}
+                    >
                         <MarkdownRenderer content={project.additionalInfo}/>
-                    </div>
+                    </motion.div>
                 )}
             </div>
         </div>

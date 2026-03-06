@@ -3,6 +3,7 @@ import {ChevronLeft, ChevronRight, Eye, Grid, Grid3x3, Play, X} from 'lucide-rea
 import {themeClasses} from '../config/theme';
 import {GalleryImage, GalleryPageContent} from '../types';
 import { useData } from '../context/DataContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const GalleryPage: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -76,21 +77,44 @@ const GalleryPage: React.FC = () => {
         return () => document.removeEventListener('keydown', handleKeyPress);
     }, [selectedImage, closeImageModal, navigateImage]);
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+    };
+
     return (
         <div className={`min-h-screen ${themeClasses.bg.page} transition-colors duration-200`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 {/* Header */}
-                <div className="text-center mb-12">
+                <motion.div 
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                    className="text-center mb-12"
+                >
                     <h1 className={`text-3xl font-bold ${themeClasses.text.accent} mb-4`}>
                         {pageContent.title}
                     </h1>
                     <p className={`${themeClasses.text.secondary} max-w-3xl mx-auto mb-8`}>
                         {pageContent.description}
                     </p>
-                </div>
+                </motion.div>
 
                 {/* Controls */}
-                <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4"
+                >
                     {/* Category Filter */}
                     <div className="flex flex-wrap gap-2">
                         {/* Only show "All" button if there are any images */}
@@ -147,88 +171,109 @@ const GalleryPage: React.FC = () => {
                             <Grid3x3 size={20}/>
                         </button>
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Gallery Grid */}
-                <div className={`grid gap-4 ${
+                <motion.div 
+                    key={`${selectedCategory}-${viewMode}`}
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className={`grid gap-4 ${
                         viewMode === 'grid'
                             ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
                             : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-                    }`}>
-                    {filteredImages.map((image: GalleryImage) => (
-                        <div
-                            key={image.id}
-                            className={`${themeClasses.card.base} overflow-hidden ${themeClasses.card.hover} cursor-pointer`}
-                            onClick={() => openImageModal(image)}
-                        >
-                            {/* Image/Video Thumbnail */}
-                            <div className={`relative overflow-hidden ${
-                                viewMode === 'masonry' ? 'aspect-auto' : 'aspect-square'
-                            }`}>
-                                <img 
-                                    src={image.imagePath} 
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    alt={image.title}
-                                />
+                    }`}
+                >
+                    <AnimatePresence mode="popLayout">
+                        {filteredImages.map((image: GalleryImage) => (
+                            <motion.div
+                                key={image.id}
+                                variants={itemVariants}
+                                layout
+                                whileHover={{ y: -5 }}
+                                className={`${themeClasses.card.base} overflow-hidden ${themeClasses.card.hover} cursor-pointer`}
+                                onClick={() => openImageModal(image)}
+                            >
+                                {/* Image/Video Thumbnail */}
+                                <div className={`relative overflow-hidden ${
+                                    viewMode === 'masonry' ? 'aspect-auto' : 'aspect-square'
+                                }`}>
+                                    <img 
+                                        src={image.imagePath} 
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        alt={image.title}
+                                    />
 
-                                {/* Video indicator */}
-                                {image.type === 'video' && (
-                                    <div className="absolute top-3 right-3 bg-black bg-opacity-75 rounded-full p-2">
-                                        <Play size={16} className="text-white" fill="currentColor"/>
-                                    </div>
-                                )}
+                                    {/* Video indicator */}
+                                    {image.type === 'video' && (
+                                        <div className="absolute top-3 right-3 bg-black bg-opacity-75 rounded-full p-2">
+                                            <Play size={16} className="text-white" fill="currentColor"/>
+                                        </div>
+                                    )}
 
-                                {/* Overlay */}
-                                <div
-                                    className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+                                    {/* Overlay */}
                                     <div
-                                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        <div className={`${themeClasses.bg.primary} text-white p-3 rounded-full`}>
-                                            {image.type === 'video' ? <Play size={24} fill="currentColor"/> :
-                                                <Eye size={24}/>}
+                                        className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+                                        <div
+                                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            <div className={`${themeClasses.bg.primary} text-white p-3 rounded-full`}>
+                                                {image.type === 'video' ? <Play size={24} fill="currentColor"/> :
+                                                    <Eye size={24}/>}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Image Info */}
-                            <div className="p-4">
-                                <h3 className="font-semibold text-gray-900 dark:text-white mb-1 truncate">
-                                    {image.title}
-                                </h3>
-                                {image.description && (
-                                    <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                                        {image.description}
-                                    </p>
-                                )}
-                                {image.tags && (
-                                    <div className="mt-2 flex flex-wrap gap-1">
-                                        {image.tags.slice(0, 3).map((tag, tagIndex) => (
-                                            <span
-                                                key={tagIndex}
-                                                className={`text-xs px-2 py-1 rounded-full ${themeClasses.bg.primaryLight} ${themeClasses.text.accent}`}
-                                            >
-                                                {tag}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                                {/* Image Info */}
+                                <div className="p-4">
+                                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1 truncate">
+                                        {image.title}
+                                    </h3>
+                                    {image.description && (
+                                        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                                            {image.description}
+                                        </p>
+                                    )}
+                                    {image.tags && (
+                                        <div className="mt-2 flex flex-wrap gap-1">
+                                            {image.tags.slice(0, 3).map((tag, tagIndex) => (
+                                                <span
+                                                    key={tagIndex}
+                                                    className={`text-xs px-2 py-1 rounded-full ${themeClasses.bg.primaryLight} ${themeClasses.text.accent}`}
+                                                >
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                </motion.div>
                 
                 {galleryImages.length === 0 && (
-                    <div className="text-center py-16">
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-center py-16"
+                    >
                         <p className="text-gray-500 dark:text-gray-400 text-lg">
                             {pageContent.emptyState?.message || "Gallery is currently being prepared. Please check back soon!"}
                         </p>
-                    </div>
+                    </motion.div>
                 )}
 
                 {/* Image Modal */}
+                <AnimatePresence>
                 {selectedImage && (
-                    <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+                    >
                         <div className="relative max-w-4xl max-h-full w-full h-full flex items-center justify-center">
                             {/* Close Button */}
                             <button
@@ -254,25 +299,37 @@ const GalleryPage: React.FC = () => {
                             </button>
 
                             {/* Image or Video */}
-                            {selectedImage.type === 'video' ? (
-                                <video
-                                    src={selectedImage.videoPath}
-                                    controls
-                                    className="max-w-full max-h-full object-contain"
-                                    poster={selectedImage.imagePath}
-                                >
-                                    Your browser does not support the video tag.
-                                </video>
-                            ) : (
-                                <img
-                                    src={selectedImage.imagePath}
-                                    alt={selectedImage.title}
-                                    className="max-w-full max-h-full object-contain"
-                                />
-                            )}
+                            <motion.div
+                                key={selectedImage.id}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                transition={{ duration: 0.2 }}
+                                className="w-full h-full flex items-center justify-center"
+                            >
+                                {selectedImage.type === 'video' ? (
+                                    <video
+                                        src={selectedImage.videoPath}
+                                        controls
+                                        className="max-w-full max-h-full object-contain"
+                                        poster={selectedImage.imagePath}
+                                    >
+                                        Your browser does not support the video tag.
+                                    </video>
+                                ) : (
+                                    <img
+                                        src={selectedImage.imagePath}
+                                        alt={selectedImage.title}
+                                        className="max-w-full max-h-full object-contain"
+                                    />
+                                )}
+                            </motion.div>
 
                             {/* Image Info */}
-                            <div
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}
                                 className="absolute bottom-4 left-4 right-4 bg-black bg-opacity-50 text-white p-4 rounded-lg">
                                 <h3 className="font-semibold text-lg mb-1">{selectedImage.title}</h3>
                                 {selectedImage.description && (
@@ -290,10 +347,11 @@ const GalleryPage: React.FC = () => {
                                         ))}
                                     </div>
                                 )}
-                            </div>
+                            </motion.div>
                         </div>
-                    </div>
+                    </motion.div>
                 )}
+                </AnimatePresence>
             </div>
         </div>
     );
