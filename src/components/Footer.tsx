@@ -1,19 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Github, Linkedin, Twitter, Instagram } from 'lucide-react';
 import { themeClasses } from '../config/theme';
 import { useData } from '../context/DataContext';
+import SocialLinks from './SocialLinks';
 
 const Footer: React.FC = () => {
     const currentYear = new Date().getFullYear();
-    const { personalInfo, footerContent, quickLinks, contactInfo } = useData();
-
-    const socialIcons = {
-        Github,
-        Linkedin,
-        Twitter,
-        Instagram
-    };
+    const { personalInfo, footerContent, quickLinks } = useData();
 
     return (
         <footer className={`border-t ${themeClasses.border.primaryLight} mt-20`}>
@@ -53,24 +46,7 @@ const Footer: React.FC = () => {
                         <h4 className={`font-semibold ${themeClasses.text.primary} mb-4`}>
                             {footerContent.sections.connect.title}
                         </h4>
-                        <div className="flex space-x-4">
-                            {(contactInfo.socialLinks || []).map((social: any) => {
-                                const Icon = socialIcons[social.icon as keyof typeof socialIcons];
-                                if (!Icon) return null;
-                                return (
-                                    <a
-                                        key={social.name}
-                                        href={social.href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={`w-10 h-10 ${themeClasses.bg.primaryLight} rounded-lg flex items-center justify-center ${themeClasses.text.secondary} transition-colors ${social.color}`}
-                                        aria-label={social.name}
-                                    >
-                                        <Icon size={18}/>
-                                    </a>
-                                );
-                            })}
-                        </div>
+                        <SocialLinks />
                         <div className="mt-4">
                             <p className={`text-sm ${themeClasses.text.secondary} mb-2`}>Get in touch</p>
                             <a

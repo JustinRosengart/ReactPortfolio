@@ -3,6 +3,7 @@ import {Clock, Code, Users, Wifi} from 'lucide-react';
 import {Skill} from '../types';
 import { themeClasses } from '../config/theme';
 import { useData } from '../context/DataContext';
+import SocialLinks from '../components/SocialLinks';
 
 const LandingPage: React.FC = () => {
     const { personalInfo, skills: skillsData, projects, pageContent } = useData();
@@ -53,6 +54,9 @@ const LandingPage: React.FC = () => {
                             </p>
                             <div className={`${themeClasses.text.secondary} leading-relaxed`}>
                                 {personalInfo.about}
+                            </div>
+                            <div className="mt-8">
+                                <SocialLinks />
                             </div>
                         </div>
                     </div>

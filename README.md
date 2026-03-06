@@ -78,6 +78,42 @@ You can dynamically change the primary accent color of your portfolio without to
 
 ---
 
+## 🔗 Configuring Social Media Links
+
+The social media links shown on the Landing Page, Contact Page, and Footer are fully dynamic and managed via Supabase.
+
+1. Open your Supabase Dashboard and go to the **Table Editor**.
+2. Open the `contact_info` table.
+3. Find the row containing your contact information and edit the `social_links` column (which is a JSONB field).
+4. Provide a JSON array containing objects for each platform.
+
+**Example JSON format:**
+```json
+[
+  {
+    "name": "GitHub",
+    "href": "https://github.com/yourusername",
+    "icon": "Github",
+    "color": "hover:text-gray-900 dark:hover:text-white"
+  },
+  {
+    "name": "LinkedIn",
+    "href": "https://linkedin.com/in/yourusername",
+    "icon": "Linkedin",
+    "color": "hover:text-blue-600 dark:hover:text-blue-400"
+  },
+  {
+    "name": "Email",
+    "href": "mailto:your.email@example.com",
+    "icon": "Mail",
+    "color": "hover:text-red-500"
+  }
+]
+```
+**Supported Icons:** `Github`, `Linkedin`, `Twitter`, `Instagram`, `Facebook`, `Youtube`, `Twitch`, `Dribbble`, `Mail` (These map directly to Lucide React icons).
+
+---
+
 ## 🐳 Docker Setup
 
 This project uses a multi-stage Docker build. First, it builds the React app using Node.js, and then it serves the static files using Nginx.

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Mail, MapPin, Linkedin, CheckCircle, XCircle } from 'lucide-react';
+import { Mail, MapPin, CheckCircle, XCircle } from 'lucide-react';
 import { themeClasses } from '../config/theme';
 import { useData } from '../context/DataContext';
+import SocialLinks from '../components/SocialLinks';
 
 const ContactPage: React.FC = () => {
     const { personalInfo, pageContent, contactInfo } = useData();
@@ -80,25 +81,9 @@ const ContactPage: React.FC = () => {
                             </div>
                         </div>
 
-                        {(contactInfo.socialLinks || []).find((link: any) => link.name === 'LinkedIn') && (
-                            <div className="flex items-center space-x-4">
-                                <div
-                                    className={`w-12 h-12 ${themeClasses.bg.primaryLight} rounded-full flex items-center justify-center transition-colors duration-200`}>
-                                    <Linkedin className={`w-6 h-6 ${themeClasses.text.secondary}`}/>
-                                </div>
-                                <div>
-                                    <p className={`text-sm ${themeClasses.text.accent}`}>{pageContent.contact.contactLabels.linkedin}</p>
-                                    <a
-                                        href={contactInfo.socialLinks.find((link: any) => link.name === 'LinkedIn')?.href || '#'}
-                                        className={`font-medium ${themeClasses.text.primary}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        {contactInfo.socialLinks.find((link: any) => link.name === 'LinkedIn')?.href?.replace('https://', '') || 'LinkedIn Profile'}
-                                    </a>
-                                </div>
-                            </div>
-                        )}
+                        <div className="pt-2">
+                            <SocialLinks />
+                        </div>
                     </div>
                 </div>
 

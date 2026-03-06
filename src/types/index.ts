@@ -95,6 +95,7 @@ export interface ContactInfo {
         name: string;
         href: string;
         color: string;
+        icon?: string;
     }>;
 }
 
