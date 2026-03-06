@@ -4,6 +4,7 @@ import {ArrowLeft, CheckCircle, ExternalLink, Github} from 'lucide-react';
 import { themeClasses } from '../config/theme';
 import ProjectGallery from '../components/ProjectGallery';
 import { useData } from '../context/DataContext';
+import LoadingScreen from '../components/LoadingScreen';
 
 // React Markdown with custom components for styling
 import ReactMarkdown from 'react-markdown';
@@ -135,7 +136,7 @@ const ProjectDetailPage: React.FC = () => {
     }, [projectIndex, navigate, projects]);
 
     if (!project) {
-        return <div className="min-h-screen flex items-center justify-center">Loading project...</div>;
+        return <LoadingScreen />;
     }
 
     const handleBack = () => {

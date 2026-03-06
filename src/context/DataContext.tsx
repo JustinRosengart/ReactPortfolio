@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../config/supabaseClient';
 import { PersonalInfo, Project, SkillCategory, LegalContent, Experience, Education, Certification, GalleryCategory, GalleryImage } from '../types';
 import { updateThemeClasses } from '../config/theme';
+import LoadingScreen from '../components/LoadingScreen';
 
 interface DataContextType {
   personalInfo: PersonalInfo;
@@ -243,7 +244,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         pageContent, footerContent, quickLinks, contactInfo, websiteTitle, websiteIcon,
         loading, error 
     }}>
-      {!loading && pageContent && footerContent ? children : <div className="min-h-screen flex items-center justify-center">Loading...</div>}
+      {!loading && pageContent && footerContent ? children : <LoadingScreen />}
     </DataContext.Provider>
   );
 };
