@@ -97,7 +97,7 @@ const MarkdownRenderer: React.FC<{ content: string }> = ({content}) => {
                         if (isInternal) {
                             return (
                                 <Link
-                                    to={href}
+                                    to={href || ''}
                                     className={`${themeClasses.text.accent} ${themeClasses.text.accentHover} underline transition-colors`}
                                 >
                                     {children}
