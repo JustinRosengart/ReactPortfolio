@@ -5,6 +5,8 @@ This project is a modern, customizable personal portfolio website built with Rea
 ## Features
 
 -   **Dynamic Content via Supabase:** All text, projects, skills, and configuration data are loaded from a PostgreSQL database in Supabase. No more hardcoded data in React!
+-   **Client-Side Caching:** Uses `sessionStorage` to cache Supabase data (2-hour expiry) to reduce database reads and drastically speed up page loads.
+-   **SPA Routing:** Seamless, app-like navigation using `react-router-dom` for internal links, eliminating full page reloads.
 -   **Image Storage:** Project and profile images can be stored and served via Supabase Storage buckets.
 -   **Tailwind CSS:** Fully styled with Tailwind for rapid UI customization.
 -   **Dark/Light Mode:** Built-in theme toggling context.
