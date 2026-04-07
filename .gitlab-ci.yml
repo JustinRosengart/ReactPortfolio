@@ -21,6 +21,7 @@ build_mr:
         --build-arg CI=false 
         --build-arg REACT_APP_SUPABASE_URL="$REACT_APP_SUPABASE_URL" 
         --build-arg REACT_APP_SUPABASE_ANON_KEY="$REACT_APP_SUPABASE_ANON_KEY" 
+        --build-arg REACT_APP_TURNSTILE_SITE_KEY="$REACT_APP_TURNSTILE_SITE_KEY" 
         --cache-from $CI_REGISTRY_IMAGE:latest 
         .
   rules:
@@ -41,6 +42,7 @@ build:
         --build-arg CI=false 
         --build-arg REACT_APP_SUPABASE_URL="$REACT_APP_SUPABASE_URL" 
         --build-arg REACT_APP_SUPABASE_ANON_KEY="$REACT_APP_SUPABASE_ANON_KEY" 
+        --build-arg REACT_APP_TURNSTILE_SITE_KEY="$REACT_APP_TURNSTILE_SITE_KEY" 
         --cache-from $CI_REGISTRY_IMAGE:latest 
         -t $IMAGE_TAG 
         -t $CI_REGISTRY_IMAGE:latest .
