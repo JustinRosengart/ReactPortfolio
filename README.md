@@ -79,15 +79,36 @@ npm run migrate-images
 ```
 
 ### 6. Configure Edge Function Secrets
-
-For Turnstile validation to work in production, you must set the secret key in your Supabase project:
-
+For Turnstile validation and email notifications to work in production, you must set the following secrets in your Supabase project:
 ```bash
+# For Turnstile
 npx supabase secrets set TURNSTILE_SECRET_KEY=your_secret_key
+
+# For Email Notifications (Resend)
+npx supabase secrets set RESEND_API_KEY=your_resend_key
+npx supabase secrets set ENGINEER_EMAIL=contact@justinr.de
 ```
 
-### 7. Start Development Server
+### 7. Deploy Edge Functions
+Upload both the submission and the notification functions:
+```bash
+npx supabase functions deploy submit-contact
+npx supabase functions deploy send-contact-email
+```
 
+### 8. Set up Database Webhook
+To trigger the email notification automatically whenever a message is saved:
+1. Go to your **Supabase Dashboard** -> **Database** -> **Webhooks**.
+2. Click **Create a new webhook**.
+3. Name: `send_contact_notification`.
+4. Table: `contact_messages`.
+5. Events: Check **Insert**.
+6. Type: Select **Supabase Edge Function**.
+7. Edge Function: Select `send-contact-email`.
+8. Method: `POST`.
+9. Click **Create Webhook**.
+
+### 9. Start Development Server
 ```bash
 npm start
 ```
