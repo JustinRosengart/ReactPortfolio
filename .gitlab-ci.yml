@@ -6,6 +6,26 @@ variables:
   IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
   # DOCKER_BUILDKIT: 1 (temporarily disabled to avoid registry cache importer error when tag is missing)
 
+build_mr:
+  stage: build
+  image: docker:24.0
+  services:
+    - docker:24.0-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - echo "Pulling previous image for cache..."
+    - docker pull $CI_REGISTRY_IMAGE:latest || true
+    - echo "Building Docker image to verify MR..."
+    - docker build 
+        --build-arg CI=false 
+        --build-arg REACT_APP_SUPABASE_URL="$REACT_APP_SUPABASE_URL" 
+        --build-arg REACT_APP_SUPABASE_ANON_KEY="$REACT_APP_SUPABASE_ANON_KEY" 
+        --cache-from $CI_REGISTRY_IMAGE:latest 
+        .
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
 build:
   stage: build
   image: docker:24.0

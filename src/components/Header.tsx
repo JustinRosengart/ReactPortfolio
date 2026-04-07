@@ -77,7 +77,11 @@ const Header: React.FC = () => {
                     <button onClick={() => handleNavigate("home")} className="flex items-center space-x-3">
                         <div className="flex items-center space-x-3">
                             <span
-                                className={`font-semibold text-lg ${themeClasses.text.accent} transition-colors duration-200`}>{personalInfo.name}</span>
+                                className={`font-semibold text-lg ${themeClasses.text.accent} transition-colors duration-200`}
+                                style={{ fontFamily: 'Exbed, sans-serif' }}
+                            >
+                                {personalInfo.name}
+                            </span>
                         </div>
                     </button>
 

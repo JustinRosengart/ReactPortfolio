@@ -52,7 +52,7 @@ const ContactPage: React.FC = () => {
 
         try {
             const { error } = await supabase
-                .from<ContactMessage>('contact_messages')
+                .from('contact_messages')
                 .insert([
                     { 
                         name: formData.name, 

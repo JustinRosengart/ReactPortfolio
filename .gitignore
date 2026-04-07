@@ -35,3 +35,5 @@ junit.xml
 /uploads
 
 package-lock.json
+/GEMINI_INPUTS/
+/GEMINI_RESPONSES/

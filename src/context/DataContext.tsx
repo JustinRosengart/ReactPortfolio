@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '../config/supabaseClient';
 import { PersonalInfo, Project, SkillCategory, LegalContent, LegalData, Experience, Education, Certification, GalleryCategory, GalleryImage } from '../types';
 import { updateThemeClasses } from '../config/theme';
@@ -306,7 +307,27 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         pageContent, footerContent, quickLinks, contactInfo, websiteTitle, websiteIcon,
         loading, error 
     }}>
-      {!loading && pageContent && footerContent ? children : <LoadingScreen />}
+      <AnimatePresence>
+        {loading || !pageContent || !footerContent ? (
+          <motion.div
+            key="loading"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.3 } }}
+            className="absolute inset-0 w-full min-h-screen z-50"
+          >
+            <LoadingScreen />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="content"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: 0.3 } }}
+            className="absolute inset-0 w-full min-h-screen"
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </DataContext.Provider>
   );
 };
