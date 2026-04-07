@@ -1,0 +1,17 @@
+node_modules
+build
+.git
+.gitignore
+.gitlab-ci.yml
+Dockerfile
+.dockerignore
+README.md
+.gemini
+GEMINI_INPUTS
+GEMINI_RESPONSES
+npm-debug.log
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

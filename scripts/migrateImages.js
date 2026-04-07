@@ -23,18 +23,10 @@ async function uploadFileToSupabase(localPath, storagePath) {
     try {
         const absolutePath = path.join(PUBLIC_DIR, localPath);
         
-        if (!fs.existsSync(absolutePath)) {
-            console.warn(`⚠️ File not found locally: ${absolutePath}`);
-            return null;
-        }
-
-        const fileBuffer = fs.readFileSync(absolutePath);
-        const mimeType = mime.lookup(absolutePath) || 'application/octet-stream';
-
         // Clean up the storage path (remove leading slashes if any)
         const cleanStoragePath = storagePath.replace(/^\/+/, '');
 
-        // Check if file already exists
+        // Check if file already exists in Supabase first
         const folderPath = cleanStoragePath.substring(0, cleanStoragePath.lastIndexOf('/'));
         const fileName = path.basename(cleanStoragePath);
         
@@ -52,6 +44,14 @@ async function uploadFileToSupabase(localPath, storagePath) {
                 .getPublicUrl(cleanStoragePath);
             return publicUrlData.publicUrl;
         }
+
+        if (!fs.existsSync(absolutePath)) {
+            console.warn(`⚠️ File not found locally: ${absolutePath}`);
+            return null;
+        }
+
+        const fileBuffer = fs.readFileSync(absolutePath);
+        const mimeType = mime.lookup(absolutePath) || 'application/octet-stream';
 
         console.log(`Uploading ${localPath} to ${cleanStoragePath}...`);
 

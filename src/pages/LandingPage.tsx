@@ -63,7 +63,7 @@ const LandingPage: React.FC = () => {
                             <div className={`w-80 h-80 bg-gradient-to-br rounded-2xl flex items-center justify-center`}>
                                 <img src={personalInfo.image}
                                      alt={personalInfo.name}
-                                     className="w-58 h-58 object-cover border-4 shadow-md rounded-2xl"/>
+                                     className="w-56 h-56 object-cover border-4 shadow-md rounded-2xl"/>
                             </div>
                         </motion.div>
                         <motion.div
