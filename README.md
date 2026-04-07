@@ -84,8 +84,12 @@ For Turnstile validation and email notifications to work in production, you must
 # For Turnstile
 npx supabase secrets set TURNSTILE_SECRET_KEY=your_secret_key
 
-# For Email Notifications (Resend)
-npx supabase secrets set RESEND_API_KEY=your_resend_key
+# For Email Notifications (SMTP)
+npx supabase secrets set SMTP_HOST=smtp.your-provider.com
+npx supabase secrets set SMTP_PORT=587
+npx supabase secrets set SMTP_USER=your-smtp-username
+npx supabase secrets set SMTP_PASS=your-smtp-password
+npx supabase secrets set SMTP_SENDER=no-reply@yourdomain.com
 npx supabase secrets set ENGINEER_EMAIL=contact@justinr.de
 ```
 
