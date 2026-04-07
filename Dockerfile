@@ -1,11 +1,14 @@
 # Phase 1: Die React-Anwendung bauen
 FROM node:20-alpine as builder
 
+# Erhöhe den Memory-Limit für Node.js (hilfreich bei kleinen Runnern)
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 WORKDIR /app
 
 # Abhängigkeiten installieren
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --no-audit --prefer-offline
 
 # Quellcode kopieren und die Anwendung bauen
 COPY . .
