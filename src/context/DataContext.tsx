@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../config/supabaseClient';
-import { PersonalInfo, Project, SkillCategory, LegalContent, Experience, Education, Certification, GalleryCategory, GalleryImage } from '../types';
+import { PersonalInfo, Project, SkillCategory, LegalContent, LegalData, Experience, Education, Certification, GalleryCategory, GalleryImage } from '../types';
 import { updateThemeClasses } from '../config/theme';
 import LoadingScreen from '../components/LoadingScreen';
 
@@ -13,9 +13,9 @@ interface DataContextType {
   certifications: Certification[];
   galleryCategories: GalleryCategory[];
   galleryImages: GalleryImage[];
-  privacyPolicy: LegalContent;
-  termsOfService: LegalContent;
-  imprint: LegalContent;
+  privacyPolicy: LegalData;
+  termsOfService: LegalData;
+  imprint: LegalData;
   pageContent: any;
   footerContent: any;
   quickLinks: any;
@@ -27,8 +27,6 @@ interface DataContextType {
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
-
-const emptyLegalContent: LegalContent = { lastUpdated: '', sections: [] };
 
 const CACHE_KEY = 'portfolio_data_cache';
 const CACHE_EXPIRY_HOURS = 24;
@@ -42,9 +40,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [galleryCategories, setGalleryCategories] = useState<GalleryCategory[]>([]);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
-  const [privacyPolicy, setPrivacyPolicy] = useState<LegalContent>(emptyLegalContent);
-  const [termsOfService, setTermsOfService] = useState<LegalContent>(emptyLegalContent);
-  const [imprint, setImprint] = useState<LegalContent>(emptyLegalContent);
+  const [privacyPolicy, setPrivacyPolicy] = useState<LegalData>('');
+  const [termsOfService, setTermsOfService] = useState<LegalData>('');
+  const [imprint, setImprint] = useState<LegalData>('');
   
   const [pageContent, setPageContent] = useState<any>(null);
   const [footerContent, setFooterContent] = useState<any>(null);
@@ -99,9 +97,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         
         let fetchedData: any = {
-            privacyPolicy: emptyLegalContent,
-            termsOfService: emptyLegalContent,
-            imprint: emptyLegalContent,
+            privacyPolicy: '',
+            termsOfService: '',
+            imprint: '',
             contactInfo: { email: '', location: '', socialLinks: [] }
         };
 

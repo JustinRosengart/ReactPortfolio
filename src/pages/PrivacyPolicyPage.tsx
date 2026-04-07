@@ -4,10 +4,11 @@ import {useNavigate} from 'react-router-dom';
 import { themeClasses } from '../config/theme';
 import { useData } from '../context/DataContext';
 import { motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 
 const PrivacyPolicyPage: React.FC = () => {
     const navigate = useNavigate();
-    const { personalInfo, privacyPolicy: privacyPolicyContent } = useData();
+    const { personalInfo, privacyPolicy } = useData();
 
     const handleBack = () => {
         navigate(-1);
@@ -16,6 +17,49 @@ const PrivacyPolicyPage: React.FC = () => {
     const fadeInUp = {
         hidden: { opacity: 0, y: 30 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+    };
+
+    const renderOldStructure = (content: any) => {
+        return (
+            <>
+                <p className={`${themeClasses.text.secondary} mb-6`}>
+                    <strong>Last updated:</strong> {content.lastUpdated}
+                </p>
+
+                {content.sections.map((section: any, index: number) => {
+                    const markdownContent = Array.isArray(section.content) 
+                        ? section.content.join('\n\n') 
+                        : section.content;
+
+                    return (
+                        <section key={index} className="mb-8">
+                            {section.title && (
+                                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+                                    {index + 1}. {section.title}
+                                </h2>
+                            )}
+                            <div className={`${themeClasses.text.secondary}`}>
+                                <ReactMarkdown
+                                    components={{
+                                        p: ({node, ...props}) => <p className="mb-4" {...props} />,
+                                        ul: ({node, ...props}) => <ul className="list-disc ml-6 mb-4 space-y-2" {...props} />,
+                                        ol: ({node, ...props}) => <ol className="list-decimal ml-6 mb-4 space-y-2" {...props} />,
+                                        li: ({node, ...props}) => <li className="pl-1" {...props} />,
+                                        h1: ({node, ...props}) => <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white" {...props} />,
+                                        h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-white" {...props} />,
+                                        h3: ({node, ...props}) => <h3 className="text-xl font-bold mt-6 mb-3 text-gray-900 dark:text-white" {...props} />,
+                                        strong: ({node, ...props}) => <strong className="font-bold text-gray-900 dark:text-white" {...props} />,
+                                        a: ({node, ...props}) => <a className={`${themeClasses.text.accent} underline hover:opacity-80`} {...props} />,
+                                    }}
+                                >
+                                    {markdownContent}
+                                </ReactMarkdown>
+                            </div>
+                        </section>
+                    );
+                })}
+            </>
+        );
     };
 
     return (
@@ -39,128 +83,36 @@ const PrivacyPolicyPage: React.FC = () => {
                     variants={fadeInUp}
                     className={`${themeClasses.card.base} p-8`}
                 >
-                    <h1 className={`text-3xl font-bold ${themeClasses.text.accent} mb-8`}>Privacy Policy</h1>
+                    <div className="max-w-none">
+                        {typeof privacyPolicy === 'string' ? (
+                            <ReactMarkdown
+                                components={{
+                                    p: ({node, ...props}) => <p className={`${themeClasses.text.secondary} mb-4`} {...props} />,
+                                    ul: ({node, ...props}) => <ul className={`${themeClasses.text.secondary} list-disc ml-6 mb-4 space-y-2`} {...props} />,
+                                    ol: ({node, ...props}) => <ol className={`${themeClasses.text.secondary} list-decimal ml-6 mb-4 space-y-2`} {...props} />,
+                                    li: ({node, ...props}) => <li className="pl-1" {...props} />,
+                                    h1: ({node, ...props}) => <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white" {...props} />,
+                                    h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-10 mb-4 text-gray-900 dark:text-white" {...props} />,
+                                    h3: ({node, ...props}) => <h3 className="text-xl font-bold mt-8 mb-3 text-gray-900 dark:text-white" {...props} />,
+                                    strong: ({node, ...props}) => <strong className="font-bold text-gray-900 dark:text-white" {...props} />,
+                                    a: ({node, ...props}) => <a className={`${themeClasses.text.accent} underline hover:opacity-80`} {...props} />,
+                                }}
+                            >
+                                {privacyPolicy}
+                            </ReactMarkdown>
+                        ) : (
+                            renderOldStructure(privacyPolicy)
+                        )}
 
-                    <div className="prose max-w-none">
-                        <p className={`${themeClasses.text.secondary} mb-6`}>
-                            <strong>Last updated:</strong> {privacyPolicyContent.lastUpdated}
-                        </p>
-
-                        {privacyPolicyContent.sections.map((section, index) => {
-                            const renderContent = (content: string | string[]) => {
-                                if (Array.isArray(content)) {
-                                    return content.map((item, itemIndex) => {
-                                        if (item.startsWith('•')) {
-                                            return (
-                                                <li key={itemIndex} className={`${themeClasses.text.secondary}`}>
-                                                    {item.substring(2)}
-                                                </li>
-                                            );
-                                        } else if (item === '') {
-                                            return <div key={itemIndex} className="mb-4"/>;
-                                        } else {
-                                            return (
-                                                <p key={itemIndex} className={`${themeClasses.text.secondary} mb-4`}>
-                                                    {item.includes(personalInfo.email) ? (
-                                                        <>
-                                                            {item.split(personalInfo.email)[0]}
-                                                            <a
-                                                                href={`mailto:${personalInfo.email}`}
-                                                                className={`${themeClasses.text.accent} ${themeClasses.text.accentHover} underline`}
-                                                            >
-                                                                {personalInfo.email}
-                                                            </a>
-                                                            {item.split(personalInfo.email)[1] || ''}
-                                                        </>
-                                                    ) : (
-                                                        item
-                                                    )}
-                                                </p>
-                                            );
-                                        }
-                                    });
-                                } else {
-                                    return (
-                                        <p className={`${themeClasses.text.secondary} mb-4`}>
-                                            {content.includes(personalInfo.email) ? (
-                                                <>
-                                                    {content.split(personalInfo.email)[0]}
-                                                    <a
-                                                        href={`mailto:${personalInfo.email}`}
-                                                        className={`${themeClasses.text.accent} ${themeClasses.text.accentHover} underline`}
-                                                    >
-                                                        {personalInfo.email}
-                                                    </a>
-                                                    {content.split(personalInfo.email)[1] || ''}
-                                                </>
-                                            ) : (
-                                                content
-                                            )}
-                                        </p>
-                                    );
-                                }
-                            };
-
-                            const hasListItems = Array.isArray(section.content) &&
-                                section.content.some(item => item.startsWith('•'));
-
-                            return (
-                                <section key={index} className="mb-8">
-                                    <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-                                        {index + 1}. {section.title}
-                                    </h2>
-                                    {hasListItems ? (
-                                        <>
-                                            {Array.isArray(section.content) && section.content
-                                                .filter(item => !item.startsWith('•') && item !== '')
-                                                .map((item, itemIndex) => (
-                                                    <p key={itemIndex}
-                                                       className="text-gray-700 dark:text-gray-300 mb-4">
-                                                        {item.includes(personalInfo.email) ? (
-                                                            <>
-                                                                {item.split(personalInfo.email)[0]}
-                                                                <a
-                                                                    href={`mailto:${personalInfo.email}`}
-                                                                    className="text-purple-600 dark:text-purple-400 hover:underline"
-                                                                >
-                                                                    {personalInfo.email}
-                                                                </a>
-                                                                {item.split(personalInfo.email)[1] || ''}
-                                                            </>
-                                                        ) : (
-                                                            item
-                                                        )}
-                                                    </p>
-                                                ))
-                                            }
-                                            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
-                                                {Array.isArray(section.content) && section.content
-                                                    .filter(item => item.startsWith('•'))
-                                                    .map((item, itemIndex) => (
-                                                        <li key={itemIndex}
-                                                            className="text-gray-700 dark:text-gray-300">
-                                                            {item.substring(2)}
-                                                        </li>
-                                                    ))
-                                                }
-                                            </ul>
-                                        </>
-                                    ) : (
-                                        renderContent(section.content)
-                                    )}
-                                </section>
-                            );
-                        })}
-
-                        <section className="mb-8">
-                            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                <p className="text-gray-700 dark:text-gray-300">
+                        <section className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+                            <div className="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-xl">
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Contact Information</h3>
+                                <p className="text-gray-700 dark:text-gray-300 mb-2">
                                     <strong>Email:</strong> <a href={`mailto:${personalInfo.email}`}
-                                                               className="text-purple-600 dark:text-purple-400 hover:underline">{personalInfo.email}</a>
+                                                               className={`${themeClasses.text.accent} hover:underline`}>{personalInfo.email}</a>
                                 </p>
                                 <p className="text-gray-700 dark:text-gray-300">
-                                    <>
-                                        <strong>Location:</strong> {personalInfo.location}</>
+                                    <strong>Location:</strong> {personalInfo.location}
                                 </p>
                             </div>
                         </section>

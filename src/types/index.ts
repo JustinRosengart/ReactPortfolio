@@ -35,6 +35,11 @@ export interface ContactFormData {
     message: string;
 }
 
+export interface ContactMessage extends ContactFormData {
+    id?: string;
+    created_at?: string;
+}
+
 export interface Experience {
     id: string;
     title: string;
@@ -112,6 +117,8 @@ export interface LegalContent {
         content: string | string[];
     }>;
 }
+
+export type LegalData = string | LegalContent;
 
 export interface GalleryImage {
     id: string;

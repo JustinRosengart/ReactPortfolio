@@ -154,6 +154,15 @@ CREATE TABLE IF NOT EXISTS public.website_config (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
+-- Table: contact_messages
+CREATE TABLE IF NOT EXISTS public.contact_messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
 -- ==========================================
 -- 3. Row Level Security (RLS) Policies
 -- ==========================================
@@ -171,20 +180,36 @@ BEGIN
         -- Enable RLS
         EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY;', table_name_var);
         
-        -- Create Select Policy (Public Read)
-        EXECUTE format('
-            CREATE POLICY "Allow public read access for %I" 
-            ON public.%I FOR SELECT 
-            USING (true);
-        ', table_name_var, table_name_var);
+        -- Special handling for contact_messages: Public can INSERT, only Authenticated can SELECT/UPDATE/DELETE
+        IF table_name_var = 'contact_messages' THEN
+            EXECUTE format('
+                CREATE POLICY "Allow public insert for %I" 
+                ON public.%I FOR INSERT 
+                WITH CHECK (true);
+            ', table_name_var, table_name_var);
 
-        -- Create All/Write Policy (Authenticated users only)
-        EXECUTE format('
-            CREATE POLICY "Allow authenticated full access for %I" 
-            ON public.%I FOR ALL 
-            USING (auth.role() = ''authenticated'') 
-            WITH CHECK (auth.role() = ''authenticated'');
-        ', table_name_var, table_name_var);
+            EXECUTE format('
+                CREATE POLICY "Allow authenticated full access for %I" 
+                ON public.%I FOR ALL 
+                USING (auth.role() = ''authenticated'') 
+                WITH CHECK (auth.role() = ''authenticated'');
+            ', table_name_var, table_name_var);
+        ELSE
+            -- Create Select Policy (Public Read)
+            EXECUTE format('
+                CREATE POLICY "Allow public read access for %I" 
+                ON public.%I FOR SELECT 
+                USING (true);
+            ', table_name_var, table_name_var);
+
+            -- Create All/Write Policy (Authenticated users only)
+            EXECUTE format('
+                CREATE POLICY "Allow authenticated full access for %I" 
+                ON public.%I FOR ALL 
+                USING (auth.role() = ''authenticated'') 
+                WITH CHECK (auth.role() = ''authenticated'');
+            ', table_name_var, table_name_var);
+        END IF;
     END LOOP;
 END
 $$;
@@ -200,5 +225,50 @@ CREATE POLICY "Public Access" ON storage.objects FOR SELECT USING ( bucket_id = 
 CREATE POLICY "Auth Insert" ON storage.objects FOR INSERT WITH CHECK ( auth.role() = 'authenticated' AND bucket_id = 'portfolio-images' );
 CREATE POLICY "Auth Update" ON storage.objects FOR UPDATE USING ( auth.role() = 'authenticated' AND bucket_id = 'portfolio-images' );
 CREATE POLICY "Auth Delete" ON storage.objects FOR DELETE USING ( auth.role() = 'authenticated' AND bucket_id = 'portfolio-images' );
+
+-- ==========================================
+-- 5. Database Webhooks for Edge Functions
+-- ==========================================
+-- This trigger will notify our Edge Function on each new contact message
+
+-- Enable the "net" extension for HTTP requests
+-- Note: You might need to enable this via the Supabase Dashboard -> Extensions
+CREATE EXTENSION IF NOT EXISTS "net";
+
+-- Create a function to call the edge function
+CREATE OR REPLACE FUNCTION public.notify_contact_email()
+RETURNS TRIGGER AS $$
+DECLARE
+  service_role_key TEXT;
+BEGIN
+  -- We fetch the service role key from the vault or a secure location
+  -- In this example, we assume it's available or set up via the dashboard
+  -- For the automated setup, we'll try to use the vault if possible, 
+  -- but typically this is configured in the Dashboard Webhooks UI.
+
+  -- Example of how to call the function via pg_net:
+  PERFORM
+    net.http_post(
+      url := 'https://' || current_setting('request.headers')::json->>'host' || '/functions/v1/send-contact-email',
+      headers := jsonb_build_object(
+        'Content-Type', 'application/json', 
+        'Authorization', 'Bearer ' || '<SERVICE_ROLE_KEY>' -- Replace with actual key or use vault
+      ),
+      body := jsonb_build_object('record', row_to_json(NEW))
+    );
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create the trigger
+CREATE TRIGGER on_contact_message_created
+  AFTER INSERT ON public.contact_messages
+  FOR EACH ROW
+  EXECUTE FUNCTION public.notify_contact_email();
+
+-- Note: In a production environment, it is highly recommended to configure Webhooks 
+-- through the Supabase Dashboard UI for better security and reliability.
+-- This SQL provides the foundation for that automation.
 
 -- Note: Execute the storage creation via Dashboard or as superuser, as standard SQL editor might not have rights for storage schema.

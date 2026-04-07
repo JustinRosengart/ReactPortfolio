@@ -4,17 +4,30 @@ import { themeClasses } from '../config/theme';
 import { useData } from '../context/DataContext';
 import SocialLinks from '../components/SocialLinks';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { supabase } from '../config/supabaseClient';
+import { ContactMessage } from '../types';
 
 const ContactPage: React.FC = () => {
-    const { personalInfo, pageContent, contactInfo } = useData();
+    const { personalInfo, pageContent } = useData();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         message: ''
     });
+    const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [submitMessage, setSubmitMessage] = useState('');
+
+    const validateForm = () => {
+        if (!formData.name.trim()) return 'Name is required';
+        if (!formData.email.trim()) return 'Email is required';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return 'Invalid email format';
+        if (!formData.message.trim()) return 'Message is required';
+        if (!agreedToTerms) return 'You must agree to the Privacy Policy and Terms of Service.';
+        return null;
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -26,16 +39,36 @@ const ContactPage: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        const validationError = validateForm();
+        if (validationError) {
+            setSubmitStatus('error');
+            setSubmitMessage(validationError);
+            return;
+        }
+
         setIsSubmitting(true);
         setSubmitStatus('idle');
 
-        // Simulate form submission
         try {
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            const { error } = await supabase
+                .from('contact_messages')
+                .insert([
+                    { 
+                        name: formData.name, 
+                        email: formData.email, 
+                        message: formData.message 
+                    }
+                ]);
+
+            if (error) throw error;
+
             setSubmitStatus('success');
             setSubmitMessage('Message sent successfully! I will get back to you soon.');
             setFormData({ name: '', email: '', message: '' });
-        } catch (error) {
+            setAgreedToTerms(false);
+        } catch (error: any) {
+            console.error('Error sending message:', error);
             setSubmitStatus('error');
             setSubmitMessage('Failed to send message. Please try again later.');
         } finally {
@@ -118,7 +151,7 @@ const ContactPage: React.FC = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
                 >
-                    <div className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
                             <label className={`block text-sm font-medium ${themeClasses.text.secondary} mb-2`}>
                                 {pageContent.contact.formLabels.name}
@@ -130,6 +163,7 @@ const ContactPage: React.FC = () => {
                                 onChange={handleInputChange}
                                 placeholder={pageContent.contact.formPlaceholders.name}
                                 className={`${themeClasses.input.base} ${themeClasses.input.focus}`}
+                                required
                             />
                         </div>
 
@@ -144,6 +178,7 @@ const ContactPage: React.FC = () => {
                                 onChange={handleInputChange}
                                 placeholder={pageContent.contact.formPlaceholders.email}
                                 className={`${themeClasses.input.base} ${themeClasses.input.focus}`}
+                                required
                             />
                         </div>
 
@@ -158,7 +193,24 @@ const ContactPage: React.FC = () => {
                                 rows={6}
                                 placeholder={pageContent.contact.formPlaceholders.message}
                                 className={`${themeClasses.input.base} ${themeClasses.input.focus} resize-none`}
+                                required
                             ></textarea>
+                        </div>
+
+                        <div className="flex items-start space-x-3">
+                            <div className="flex items-center h-5">
+                                <input
+                                    id="terms"
+                                    type="checkbox"
+                                    checked={agreedToTerms}
+                                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                                    className={`w-4 h-4 rounded border-gray-300 focus:ring-primary dark:border-gray-700 dark:bg-gray-800 text-blue-600 focus:ring-blue-500`}
+                                    required
+                                />
+                            </div>
+                            <label htmlFor="terms" className={`text-sm ${themeClasses.text.secondary}`}>
+                                I agree to the <Link to="/privacy-policy" className={`${themeClasses.text.accent} hover:underline`}>Privacy Policy</Link> and the storage of my data.
+                            </label>
                         </div>
 
                         {submitStatus !== 'idle' && (
@@ -188,13 +240,13 @@ const ContactPage: React.FC = () => {
                         <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            onClick={handleSubmit}
+                            type="submit"
                             disabled={isSubmitting}
                             className={`w-full ${themeClasses.button.primary} disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
                         >
                             {isSubmitting ? 'Sending...' : pageContent.contact.formLabels.submit}
                         </motion.button>
-                    </div>
+                    </form>
                 </motion.div>
             </div>
         </div>

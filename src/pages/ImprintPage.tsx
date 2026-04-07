@@ -4,10 +4,11 @@ import {useNavigate} from 'react-router-dom';
 import { themeClasses } from '../config/theme';
 import { useData } from '../context/DataContext';
 import { motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 
 const ImprintPage: React.FC = () => {
     const navigate = useNavigate();
-    const { personalInfo, imprint: imprintContent } = useData();
+    const { personalInfo, imprint } = useData();
 
     const handleBack = () => {
         navigate(-1);
@@ -16,6 +17,49 @@ const ImprintPage: React.FC = () => {
     const fadeInUp = {
         hidden: { opacity: 0, y: 30 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+    };
+
+    const renderOldStructure = (content: any) => {
+        return (
+            <>
+                <p className={`${themeClasses.text.secondary} mb-6`}>
+                    <strong>Stand:</strong> {content.lastUpdated}
+                </p>
+
+                {content.sections.map((section: any, index: number) => {
+                    const markdownContent = Array.isArray(section.content) 
+                        ? section.content.join('\n\n') 
+                        : section.content;
+
+                    return (
+                        <section key={index} className="mb-8">
+                            {section.title && (
+                                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+                                    {section.title}
+                                </h2>
+                            )}
+                            <div className={`${themeClasses.text.secondary}`}>
+                                <ReactMarkdown
+                                    components={{
+                                        p: ({node, ...props}) => <p className="mb-4" {...props} />,
+                                        ul: ({node, ...props}) => <ul className="list-disc ml-6 mb-4 space-y-2" {...props} />,
+                                        ol: ({node, ...props}) => <ol className="list-decimal ml-6 mb-4 space-y-2" {...props} />,
+                                        li: ({node, ...props}) => <li className="pl-1" {...props} />,
+                                        h1: ({node, ...props}) => <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white" {...props} />,
+                                        h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-white" {...props} />,
+                                        h3: ({node, ...props}) => <h3 className="text-xl font-bold mt-6 mb-3 text-gray-900 dark:text-white" {...props} />,
+                                        strong: ({node, ...props}) => <strong className="font-bold text-gray-900 dark:text-white" {...props} />,
+                                        a: ({node, ...props}) => <a className={`${themeClasses.text.accent} underline hover:opacity-80`} {...props} />,
+                                    }}
+                                >
+                                    {markdownContent}
+                                </ReactMarkdown>
+                            </div>
+                        </section>
+                    );
+                })}
+            </>
+        );
     };
 
     return (
@@ -39,52 +83,26 @@ const ImprintPage: React.FC = () => {
                     variants={fadeInUp}
                     className={`${themeClasses.card.base} p-8`}
                 >
-                    <h1 className={`text-3xl font-bold ${themeClasses.text.accent} mb-8`}>Imprint</h1>
-
-                    <div className="prose max-w-none">
-                        <p className={`${themeClasses.text.secondary} mb-6`}>
-                            <strong>Stand:</strong> {imprintContent.lastUpdated}
-                        </p>
-
-                        {imprintContent.sections.map((section, index) => {
-                            const renderContent = (content: string | string[]) => {
-                                if (Array.isArray(content)) {
-                                    return content.map((item, itemIndex) => (
-                                        <p key={itemIndex} className={`${themeClasses.text.secondary} mb-2`}>
-                                            {item.includes(personalInfo.email) ? (
-                                                <>
-                                                    {item.split(personalInfo.email)[0]}
-                                                    <a
-                                                        href={`mailto:${personalInfo.email}`}
-                                                        className={`${themeClasses.text.accent} ${themeClasses.text.accentHover} underline`}
-                                                    >
-                                                        {personalInfo.email}
-                                                    </a>
-                                                    {item.split(personalInfo.email)[1] || ''}
-                                                </>
-                                            ) : (
-                                                item
-                                            )}
-                                        </p>
-                                    ));
-                                } else {
-                                    return (
-                                        <p className={`${themeClasses.text.secondary} mb-4`}>
-                                            {content}
-                                        </p>
-                                    );
-                                }
-                            };
-
-                            return (
-                                <section key={index} className="mb-8">
-                                    <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-                                        {section.title}
-                                    </h2>
-                                    {renderContent(section.content)}
-                                </section>
-                            );
-                        })}
+                    <div className="max-w-none">
+                        {typeof imprint === 'string' ? (
+                            <ReactMarkdown
+                                components={{
+                                    p: ({node, ...props}) => <p className={`${themeClasses.text.secondary} mb-4`} {...props} />,
+                                    ul: ({node, ...props}) => <ul className={`${themeClasses.text.secondary} list-disc ml-6 mb-4 space-y-2`} {...props} />,
+                                    ol: ({node, ...props}) => <ol className={`${themeClasses.text.secondary} list-decimal ml-6 mb-4 space-y-2`} {...props} />,
+                                    li: ({node, ...props}) => <li className="pl-1" {...props} />,
+                                    h1: ({node, ...props}) => <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white" {...props} />,
+                                    h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-10 mb-4 text-gray-900 dark:text-white" {...props} />,
+                                    h3: ({node, ...props}) => <h3 className="text-xl font-bold mt-8 mb-3 text-gray-900 dark:text-white" {...props} />,
+                                    strong: ({node, ...props}) => <strong className="font-bold text-gray-900 dark:text-white" {...props} />,
+                                    a: ({node, ...props}) => <a className={`${themeClasses.text.accent} underline hover:opacity-80`} {...props} />,
+                                }}
+                            >
+                                {imprint}
+                            </ReactMarkdown>
+                        ) : (
+                            renderOldStructure(imprint)
+                        )}
                     </div>
                 </motion.div>
             </div>
