@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {Briefcase, CircleUserRound, House, Image, Mail, Menu, Moon, Sun, X} from 'lucide-react';
 import {NavItem} from '../types';
-import {useTheme} from "../contexts/ThemeContext";
+import {useTheme} from "../context/ThemeContext";
 import {themeClasses} from '../config/theme';
 import { useData } from '../context/DataContext';
 
