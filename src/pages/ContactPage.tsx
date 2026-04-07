@@ -6,7 +6,7 @@ import SocialLinks from '../components/SocialLinks';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { supabase } from '../config/supabaseClient';
-import { ContactMessage } from '../types';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 const ContactPage: React.FC = () => {
     const { personalInfo, pageContent } = useData();
@@ -16,9 +16,12 @@ const ContactPage: React.FC = () => {
         message: ''
     });
     const [agreedToTerms, setAgreedToTerms] = useState(false);
+    const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [submitMessage, setSubmitMessage] = useState('');
+
+    const TURNSTILE_SITE_KEY = process.env.REACT_APP_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
 
     const validateForm = () => {
         if (!formData.name.trim()) return 'Name is required';
@@ -26,6 +29,7 @@ const ContactPage: React.FC = () => {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return 'Invalid email format';
         if (!formData.message.trim()) return 'Message is required';
         if (!agreedToTerms) return 'You must agree to the Privacy Policy and Terms of Service.';
+        if (!turnstileToken) return 'Please complete the CAPTCHA.';
         return null;
     };
 
@@ -51,15 +55,14 @@ const ContactPage: React.FC = () => {
         setSubmitStatus('idle');
 
         try {
-            const { error } = await supabase
-                .from('contact_messages')
-                .insert([
-                    { 
-                        name: formData.name, 
-                        email: formData.email, 
-                        message: formData.message 
-                    }
-                ]);
+            const { data, error } = await supabase.functions.invoke('submit-contact', {
+                body: { 
+                    name: formData.name, 
+                    email: formData.email, 
+                    message: formData.message,
+                    token: turnstileToken
+                }
+            });
 
             if (error) throw error;
 
@@ -67,13 +70,19 @@ const ContactPage: React.FC = () => {
             setSubmitMessage('Message sent successfully! I will get back to you soon.');
             setFormData({ name: '', email: '', message: '' });
             setAgreedToTerms(false);
+            setTurnstileToken(null); // Reset token after success
         } catch (error: any) {
             console.error('Error sending message:', error);
             setSubmitStatus('error');
-            setSubmitMessage('Failed to send message. Please try again later.');
+            setSubmitMessage(error.message || 'Failed to send message. Please try again later.');
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleTurnstileError = () => {
+        setSubmitStatus('error');
+        setSubmitMessage('Spam protection could not be loaded. Please refresh the page or try again later.');
     };
 
     const fadeInUp = {
@@ -237,11 +246,23 @@ const ContactPage: React.FC = () => {
                             </motion.div>
                         )}
 
+                        <div className="flex justify-center">
+                            <Turnstile 
+                                siteKey={TURNSTILE_SITE_KEY}
+                                onSuccess={(token) => setTurnstileToken(token)}
+                                onExpire={() => setTurnstileToken(null)}
+                                onError={handleTurnstileError}
+                                options={{
+                                    theme: 'auto',
+                                }}
+                            />
+                        </div>
+
                         <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             type="submit"
-                            disabled={isSubmitting}
+                            disabled={isSubmitting || !turnstileToken}
                             className={`w-full ${themeClasses.button.primary} disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
                         >
                             {isSubmitting ? 'Sending...' : pageContent.contact.formLabels.submit}
