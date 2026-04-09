@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '../config/supabaseClient';
 import { PersonalInfo, Project, SkillCategory, LegalContent, LegalData, Experience, Education, Certification, GalleryCategory, GalleryImage } from '../types';
 import { updateThemeClasses } from '../config/theme';
 import LoadingScreen from '../components/LoadingScreen';
+import { useLanguage } from './LanguageContext';
 
 interface DataContextType {
   personalInfo: PersonalInfo;
@@ -32,26 +33,27 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 const CACHE_KEY = 'portfolio_data_cache';
 const CACHE_EXPIRY_HOURS = 24;
 
-export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({} as PersonalInfo);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [skills, setSkills] = useState<SkillCategory[]>([]);
-  const [experiences, setExperiences] = useState<Experience[]>([]);
-  const [educations, setEducations] = useState<Education[]>([]);
-  const [certifications, setCertifications] = useState<Certification[]>([]);
-  const [galleryCategories, setGalleryCategories] = useState<GalleryCategory[]>([]);
-  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
-  const [privacyPolicy, setPrivacyPolicy] = useState<LegalData>('');
-  const [termsOfService, setTermsOfService] = useState<LegalData>('');
-  const [imprint, setImprint] = useState<LegalData>('');
+// Helper to recursively resolve translated fields
+const resolveLanguageData = (obj: any, lang: string): any => {
+  if (!obj) return obj;
+  if (typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(item => resolveLanguageData(item, lang));
   
-  const [pageContent, setPageContent] = useState<any>(null);
-  const [footerContent, setFooterContent] = useState<any>(null);
-  const [quickLinks, setQuickLinks] = useState<any>([]);
-  const [contactInfo, setContactInfo] = useState<any>({ email: '', location: '', socialLinks: [] });
-  const [websiteTitle, setWebsiteTitle] = useState<string>('Portfolio');
-  const [websiteIcon, setWebsiteIcon] = useState<string>('');
+  // If it's a translation object (has 'en' and 'de' keys)
+  if ('en' in obj && 'de' in obj && Object.keys(obj).length <= 2) {
+    return obj[lang] || obj['en'];
+  }
+  
+  const result: any = {};
+  for (const key in obj) {
+    result[key] = resolveLanguageData(obj[key], lang);
+  }
+  return result;
+};
 
+export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { language } = useLanguage();
+  const [rawData, setRawData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -66,29 +68,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const cachedData = JSON.parse(cachedDataStr);
             const now = new Date().getTime();
             if (now < cachedData.expiry) {
-                // Load from cache
-                setPersonalInfo(cachedData.data.personalInfo);
-                setProjects(cachedData.data.projects);
-                setSkills(cachedData.data.skills);
-                setExperiences(cachedData.data.experiences);
-                setEducations(cachedData.data.educations);
-                setCertifications(cachedData.data.certifications);
-                setGalleryCategories(cachedData.data.galleryCategories);
-                setGalleryImages(cachedData.data.galleryImages);
-                setPrivacyPolicy(cachedData.data.privacyPolicy);
-                setTermsOfService(cachedData.data.termsOfService);
-                setImprint(cachedData.data.imprint);
-                setPageContent(cachedData.data.pageContent);
-                setFooterContent(cachedData.data.footerContent);
-                setQuickLinks(cachedData.data.quickLinks);
-                setContactInfo(cachedData.data.contactInfo);
-                setWebsiteTitle(cachedData.data.websiteTitle);
-                setWebsiteIcon(cachedData.data.websiteIcon);
-                
                 if (cachedData.data.accentColor) {
                     updateThemeClasses(cachedData.data.accentColor);
                 }
-                
+                setRawData(cachedData.data);
                 setLoading(false);
                 return; // Exit early
             } else {
@@ -101,7 +84,20 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             privacyPolicy: '',
             termsOfService: '',
             imprint: '',
-            contactInfo: { email: '', location: '', socialLinks: [] }
+            contactInfo: { email: '', location: '', socialLinks: [] },
+            personalInfo: {} as PersonalInfo,
+            projects: [],
+            skills: [],
+            experiences: [],
+            educations: [],
+            certifications: [],
+            galleryCategories: [],
+            galleryImages: [],
+            pageContent: null,
+            footerContent: null,
+            quickLinks: [],
+            websiteTitle: 'Portfolio',
+            websiteIcon: ''
         };
 
         // Fetch personal info
@@ -121,7 +117,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             about: piData.about,
             topSkills: piData.top_skills || []
           };
-          setPersonalInfo(fetchedData.personalInfo);
         }
 
         // Fetch contact info (social links)
@@ -132,14 +127,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 location: ciData.location || piData?.location,
                 socialLinks: ciData.social_links || []
             };
-            setContactInfo(fetchedData.contactInfo);
         } else if (piData) {
             fetchedData.contactInfo = {
                 email: piData.email,
                 location: piData.location,
                 socialLinks: []
             };
-            setContactInfo(fetchedData.contactInfo);
         }
 
         // Fetch skills
@@ -151,7 +144,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             description: s.description,
             icon: s.icon
           }));
-          setSkills(fetchedData.skills);
         }
 
         // Fetch projects
@@ -174,7 +166,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             features: p.features || [],
             technologies: p.technologies || []
           }));
-          setProjects(fetchedData.projects);
         }
 
         // Fetch experiences
@@ -193,7 +184,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             description: e.description,
             skills: e.skills || []
           }));
-          setExperiences(fetchedData.experiences);
         }
 
         // Fetch educations
@@ -211,7 +201,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             description: e.description,
             skills: e.skills || []
           }));
-          setEducations(fetchedData.educations);
         }
 
         // Fetch certifications
@@ -228,7 +217,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             credentialUrl: c.credential_url,
             description: c.description
           }));
-          setCertifications(fetchedData.certifications);
         }
 
         // Fetch gallery categories and images
@@ -252,7 +240,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
              videoPath: gi.video_path
           }));
           fetchedData.galleryImages = formattedImages;
-          setGalleryImages(formattedImages);
 
           fetchedData.galleryCategories = gcData.map(gc => ({
              id: gc.id,
@@ -260,7 +247,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
              description: gc.description,
              images: formattedImages.filter(img => img.category === gc.id)
           }));
-          setGalleryCategories(fetchedData.galleryCategories);
         }
 
         // Fetch all website config
@@ -268,14 +254,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (configError) console.error('Config fetch error:', configError);
         if (configData) {
             configData.forEach(item => {
-                if (item.config_key === 'privacyPolicyContent') { fetchedData.privacyPolicy = item.config_value; setPrivacyPolicy(item.config_value); }
-                if (item.config_key === 'termsOfServiceContent') { fetchedData.termsOfService = item.config_value; setTermsOfService(item.config_value); }
-                if (item.config_key === 'imprintContent') { fetchedData.imprint = item.config_value; setImprint(item.config_value); }
-                if (item.config_key === 'pageContent') { fetchedData.pageContent = item.config_value; setPageContent(item.config_value); }
-                if (item.config_key === 'footerContent') { fetchedData.footerContent = item.config_value; setFooterContent(item.config_value); }
-                if (item.config_key === 'quickLinks') { fetchedData.quickLinks = item.config_value; setQuickLinks(item.config_value); }
-                if (item.config_key === 'websiteTitle') { fetchedData.websiteTitle = item.config_value; setWebsiteTitle(item.config_value); }
-                if (item.config_key === 'websiteIcon') { fetchedData.websiteIcon = item.config_value; setWebsiteIcon(item.config_value); }
+                if (item.config_key === 'privacyPolicyContent') { fetchedData.privacyPolicy = item.config_value; }
+                if (item.config_key === 'termsOfServiceContent') { fetchedData.termsOfService = item.config_value; }
+                if (item.config_key === 'imprintContent') { fetchedData.imprint = item.config_value; }
+                if (item.config_key === 'pageContent') { fetchedData.pageContent = item.config_value; }
+                if (item.config_key === 'footerContent') { fetchedData.footerContent = item.config_value; }
+                if (item.config_key === 'quickLinks') { fetchedData.quickLinks = item.config_value; }
+                if (item.config_key === 'websiteTitle') { fetchedData.websiteTitle = item.config_value; }
+                if (item.config_key === 'websiteIcon') { fetchedData.websiteIcon = item.config_value; }
                 if (item.config_key === 'accentColor') {
                     fetchedData.accentColor = item.config_value;
                     // Update theme color globally
@@ -283,6 +269,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
             });
         }
+
+        setRawData(fetchedData);
 
         // Save to cache
         sessionStorage.setItem(CACHE_KEY, JSON.stringify({
@@ -301,14 +289,19 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fetchData();
   }, []);
 
+  const resolvedData = useMemo(() => {
+      if (!rawData) return null;
+      return resolveLanguageData(rawData, language);
+  }, [rawData, language]);
+
   return (
-    <DataContext.Provider value={{ 
-        personalInfo, projects, skills, experiences, educations, certifications, galleryCategories, galleryImages, privacyPolicy, termsOfService, imprint, 
-        pageContent, footerContent, quickLinks, contactInfo, websiteTitle, websiteIcon,
-        loading, error 
-    }}>
+    <DataContext.Provider value={
+      resolvedData 
+        ? { ...resolvedData, loading, error } 
+        : ({ loading: true, error: null } as any)
+    }>
       <AnimatePresence>
-        {loading || !pageContent || !footerContent ? (
+        {loading || !resolvedData?.pageContent || !resolvedData?.footerContent ? (
           <motion.div
             key="loading"
             initial={{ opacity: 1 }}
