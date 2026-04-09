@@ -1,6 +1,7 @@
 import React from 'react';
 import {BrowserRouter, Route, Routes, useLocation} from 'react-router-dom';
-import {ThemeProvider} from './context/ThemeContext';
+import { ThemeProvider } from './context/ThemeContext';
+import { LanguageProvider } from './context/LanguageContext';
 import { DataProvider, useData } from './context/DataContext';
 import {themeClasses} from './config/theme';
 import Header from './components/Header';
@@ -15,7 +16,7 @@ import ProfilePage from './pages/ProfilePage';
 import TOSPage from "./pages/TOSPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import ImprintPage from "./pages/ImprintPage";
-import {Helmet} from "react-helmet";
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -79,13 +80,17 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => (
-    <ThemeProvider>
-        <DataProvider>
-            <BrowserRouter>
-                <AppContent />
-            </BrowserRouter>
-        </DataProvider>
-    </ThemeProvider>
+    <HelmetProvider>
+        <ThemeProvider>
+            <LanguageProvider>
+                <DataProvider>
+                    <BrowserRouter>
+                        <AppContent />
+                    </BrowserRouter>
+                </DataProvider>
+            </LanguageProvider>
+        </ThemeProvider>
+    </HelmetProvider>
 );
 
 export default App;

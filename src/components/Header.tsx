@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
-import {Briefcase, CircleUserRound, House, Image, Mail, Menu, Moon, Sun, X} from 'lucide-react';
+import {Briefcase, CircleUserRound, House, Image, Mail, Menu, Moon, Sun, X, Globe} from 'lucide-react';
 import {NavItem} from '../types';
 import {useTheme} from "../context/ThemeContext";
+import {useLanguage} from "../context/LanguageContext";
 import {themeClasses} from '../config/theme';
 import { useData } from '../context/DataContext';
 
@@ -11,6 +12,7 @@ const Header: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const {isDarkMode, toggleTheme} = useTheme();
+    const {language, setLanguage} = useLanguage();
     const { personalInfo, projects, galleryImages = [] } = useData();
 
     const allNavItems: NavItem[] = [
@@ -103,8 +105,17 @@ const Header: React.FC = () => {
                         ))}
                     </nav>
 
-                    {/* Dark Mode Toggle - Icon shows CURRENT state, click switches to opposite */}
-                    <div className="hidden md:block">
+                    {/* Right side actions: Language & Dark Mode */}
+                    <div className="hidden md:flex items-center space-x-2">
+                        <button
+                            onClick={() => setLanguage(language === 'en' ? 'de' : 'en')}
+                            className={`p-2 rounded-lg flex items-center space-x-1 font-semibold text-sm ${themeClasses.text.tertiary} ${themeClasses.text.accentHover} transition-colors duration-200`}
+                            aria-label="Toggle language"
+                        >
+                            <Globe size={18}/>
+                            <span>{language === 'en' ? 'DE' : 'EN'}</span>
+                        </button>
+
                         <button
                             onClick={toggleTheme}
                             className={`p-2 rounded-lg ${themeClasses.text.tertiary} ${themeClasses.text.accentHover} transition-colors duration-200`}
@@ -142,6 +153,15 @@ const Header: React.FC = () => {
                                     <span>{item.label}</span>
                                 </button>
                             ))}
+
+                            {/* Mobile Language Toggle */}
+                            <button
+                                onClick={() => setLanguage(language === 'en' ? 'de' : 'en')}
+                                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium ${themeClasses.text.secondary} ${themeClasses.text.accentHover} transition-colors duration-200`}
+                            >
+                                <Globe size={16}/>
+                                <span>{language === 'en' ? 'DE' : 'EN'}</span>
+                            </button>
 
                             {/* Mobile Dark Mode Toggle */}
                             <button
