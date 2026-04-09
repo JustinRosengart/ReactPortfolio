@@ -9,7 +9,7 @@ const ProjectsPage: React.FC = () => {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [showAll, setShowAll] = useState(false);
     const navigate = useNavigate();
-    const { projects, pageContent } = useData();
+    const { projects = [], pageContent } = useData();
 
     // Calculate project statistics
     const completedProjects = (projects || []).filter((p: any) => p.status === 'completed').length;
