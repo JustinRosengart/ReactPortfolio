@@ -7,7 +7,7 @@ import SocialLinks from '../components/SocialLinks';
 import { motion } from 'framer-motion';
 
 const LandingPage: React.FC = () => {
-    const { personalInfo, skills: skillsData, projects, pageContent } = useData();
+    const { personalInfo, skills: skillsData = [], projects = [], pageContent } = useData();
 
     // Helper function to render icons dynamically based on string
     const getIcon = (iconName: string): React.ReactNode => {

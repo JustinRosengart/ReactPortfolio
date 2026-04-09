@@ -19,7 +19,7 @@ const getIcon = (iconName: string | null | undefined) => {
 };
 
 const ProfilePage: React.FC = () => {
-    const { personalInfo, experiences, educations, certifications } = useData();
+    const { personalInfo, experiences = [], educations = [], certifications = [] } = useData();
 
     const fadeInUp = {
         hidden: { opacity: 0, y: 30 },

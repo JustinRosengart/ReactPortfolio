@@ -11,7 +11,7 @@ const Header: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const {isDarkMode, toggleTheme} = useTheme();
-    const { personalInfo, projects, galleryImages } = useData();
+    const { personalInfo, projects, galleryImages = [] } = useData();
 
     const allNavItems: NavItem[] = [
         {id: 'home', label: 'Home', icon: House},
