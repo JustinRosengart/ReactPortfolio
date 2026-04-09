@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Mail, MapPin, CheckCircle, XCircle } from 'lucide-react';
+import { Mail, MapPin, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { themeClasses } from '../config/theme';
 import { useData } from '../context/DataContext';
 import SocialLinks from '../components/SocialLinks';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { supabase } from '../config/supabaseClient';
 import { Turnstile } from '@marsidev/react-turnstile';
@@ -159,8 +159,28 @@ const ContactPage: React.FC = () => {
                     initial={{ opacity: 0, x: 30 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
+                    className="relative"
                 >
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <AnimatePresence>
+                        {isSubmitting && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="absolute -inset-4 sm:-inset-8 z-10 flex flex-col items-center justify-center rounded-3xl bg-white/40 dark:bg-gray-900/40 backdrop-blur-[2px]"
+                            >
+                                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 flex flex-col items-center">
+                                    <Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-3" />
+                                    <span className={`font-semibold ${themeClasses.text.primary}`}>Sending message...</span>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    <form 
+                        onSubmit={handleSubmit} 
+                        className={`space-y-6 transition-opacity duration-300 ${isSubmitting ? 'opacity-50 pointer-events-none' : ''}`}
+                    >
                         <div>
                             <label className={`block text-sm font-medium ${themeClasses.text.secondary} mb-2`}>
                                 {pageContent.contact.formLabels.name}
@@ -263,9 +283,16 @@ const ContactPage: React.FC = () => {
                             whileTap={{ scale: 0.98 }}
                             type="submit"
                             disabled={isSubmitting || !turnstileToken}
-                            className={`w-full ${themeClasses.button.primary} disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
+                            className={`w-full ${themeClasses.button.primary} disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2`}
                         >
-                            {isSubmitting ? 'Sending...' : pageContent.contact.formLabels.submit}
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                    <span>Sending...</span>
+                                </>
+                            ) : (
+                                <span>{pageContent.contact.formLabels.submit}</span>
+                            )}
                         </motion.button>
                     </form>
                 </motion.div>
