@@ -3,6 +3,7 @@ import { MapPin, Briefcase, GraduationCap, Award, Users, Clipboard } from 'lucid
 import { themeClasses } from '../config/theme';
 import { useData } from '../context/DataContext';
 import { motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 
 const iconMap: { [key: string]: any } = {
     Briefcase,
@@ -151,9 +152,28 @@ const ProfilePage: React.FC = () => {
                                         {experience.type && <> · {experience.type}</>}
                                     </p>
                                     
-                                    <p className={`${themeClasses.text.secondary} mb-4 leading-relaxed`}>
-                                        {experience.description}
-                                    </p>
+                                    {experience.description && (
+                                        <div className={`${themeClasses.text.secondary} mb-4 leading-relaxed`}>
+                                            <ReactMarkdown
+                                                components={{
+                                                    p: ({children}) => (
+                                                        <p className="mb-3 leading-relaxed">{children}</p>
+                                                    ),
+                                                    ul: ({children}) => (
+                                                        <ul className="list-disc list-outside pl-5 space-y-1">{children}</ul>
+                                                    ),
+                                                    li: ({children}) => (
+                                                        <li>{children}</li>
+                                                    ),
+                                                    strong: ({children}) => (
+                                                        <strong className={themeClasses.text.primary}>{children}</strong>
+                                                    )
+                                                }}
+                                            >
+                                                {experience.description}
+                                            </ReactMarkdown>
+                                        </div>
+                                    )}
                                 </motion.div>
                             );
                         })}
